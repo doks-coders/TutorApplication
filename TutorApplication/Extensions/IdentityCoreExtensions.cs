@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TutorApplication.Infrastructure.Data;
@@ -12,7 +10,7 @@ namespace TutorApplication.Extensions
 {
 	public static class IdentityCoreExtensions
 	{
-		public static IServiceCollection ConfigureIdentityServices(this IServiceCollection services,IConfiguration config)
+		public static IServiceCollection ConfigureIdentityServices(this IServiceCollection services, IConfiguration config)
 		{
 			services.Configure<JwtOptions>(config.GetSection("JwtOptions"));
 

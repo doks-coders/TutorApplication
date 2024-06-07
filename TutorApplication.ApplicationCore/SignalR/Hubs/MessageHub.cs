@@ -1,10 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.ApplicationCore.SignalR.Services;
 using TutorApplication.ApplicationCore.Utils;
@@ -30,14 +24,14 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 		}
 
-	
+
 		public override async Task OnConnectedAsync()
 		{
 
 			try
 			{
 				var session = GetSessionInfo();
-				string recieverName= await _hubServices.GetReceiver(session.IsGroup,session.RecieverId,session.CourseGroupId);
+				string recieverName = await _hubServices.GetReceiver(session.IsGroup, session.RecieverId, session.CourseGroupId);
 
 				var groupName = HubUtils.GetGroupName(session.SenderEmail, recieverName, session.IsGroup);
 				await _hubServices.AddConnectionToGroup(groupName, Context.ConnectionId);
@@ -54,11 +48,11 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 				await Clients.Group(groupName).SendAsync("Connected", responses);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				throw new HubException("Yes!!!");
 			}
-			
+
 		}
 
 		public async Task SendMessage(MessageRequest request)
@@ -69,7 +63,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 			string recieverName = await _hubServices.GetReceiver(isGroup, request.RecieverId.ToString(), request.CourseGroupId.ToString());
 
-			var groupName =  HubUtils.GetGroupName(senderEmail, recieverName, isGroup);
+			var groupName = HubUtils.GetGroupName(senderEmail, recieverName, isGroup);
 
 			MessageResponse response;
 			if (request.isGroup)
@@ -80,7 +74,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			{
 				response = await _messageHubServices.SendDirectMessage(request, senderId, groupName);
 			}
-			
+
 			await Clients.Group(groupName).SendAsync("NewMessage", response);
 		}
 
@@ -98,17 +92,17 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			string? CourseGroupId = httpContext?.Request.Query["CourseGroupId"];
 			string? RecieverId = httpContext?.Request.Query["RecieverId"];
 			string? isGroup = httpContext?.Request.Query["isGroup"];
-	
+
 			if (RecieverId == null) throw new HubException("No User");
 
 			var senderEmail = Context.User.GetUserEmail();
 			var senderId = Context.User.GetUserId();
 
-			return new SessionInfo() { IsGroup=isGroup,RecieverId=RecieverId,SenderEmail=senderEmail,SenderId=senderId,CourseGroupId=CourseGroupId};
+			return new SessionInfo() { IsGroup = isGroup, RecieverId = RecieverId, SenderEmail = senderEmail, SenderId = senderId, CourseGroupId = CourseGroupId };
 		}
 
-		
-		
+
+
 	}
-	
+
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Responses;
 
@@ -12,10 +6,10 @@ namespace TutorApplication.ApplicationCore.Utils
 {
 	public static class TutorServiceUtils
 	{
-		
+
 		public static Dictionary<string, List<MemoResponse>> ConvertMemosToWeekChapters(this IEnumerable<Memo> memos)
 		{
-			var memoResponse = memos.Select(e => new MemoResponse() {Date= ConvertDateStringToDate(e.Date),BookInfo=e.BookInfo,Time=e.Time,Type=e.Type } );
+			var memoResponse = memos.Select(e => new MemoResponse() { Date = ConvertDateStringToDate(e.Date), BookInfo = e.BookInfo, Time = e.Time, Type = e.Type });
 			IEnumerable<MemoResponse> orderedMemos = memoResponse.OrderBy(e => e.Date);
 
 			int numberOfDaysInAWeek = 7;
@@ -36,7 +30,7 @@ namespace TutorApplication.ApplicationCore.Utils
 
 				if (!Weeks.ContainsKey(week.ToString()))
 				{
-					Weeks.Add(week.ToString(), new List<MemoResponse> { memo});
+					Weeks.Add(week.ToString(), new List<MemoResponse> { memo });
 				}
 				else
 				{
@@ -51,7 +45,7 @@ namespace TutorApplication.ApplicationCore.Utils
 
 		private static DateTime ConvertDateStringToDate(string? dateString = "1/12/2024")
 		{
-			string format = "d/M/yyyy"; 
+			string format = "d/M/yyyy";
 			CultureInfo provider = CultureInfo.InvariantCulture;
 			try
 			{

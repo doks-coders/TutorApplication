@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TutorApplication.SharedModels.Entities;
-
-namespace TutorApplication.SharedModels.Responses
+﻿namespace TutorApplication.SharedModels.Responses
 {
 	public class TutorExtendedResponse
 	{
@@ -20,5 +13,5 @@ namespace TutorApplication.SharedModels.Responses
 		public List<StudentResponse> Students { get; set; }
 	}
 
-	
+
 }

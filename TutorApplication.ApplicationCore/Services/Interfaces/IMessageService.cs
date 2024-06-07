@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TutorApplication.SharedModels.Entities;
+﻿using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 using TutorApplication.SharedModels.Responses.Messages;
@@ -24,6 +18,7 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 		Task<ResponseModel> DeleteMessage(int messageId);
 
 		Task<ResponseModel> GetContactsForStudents(int studentId);
+
 		Task<ResponseModel> GetContactsForTutors(int tutorId);
 
 	}

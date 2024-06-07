@@ -1,32 +1,25 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.SharedModels.Models;
-using static TutorApplication.ApplicationCore.SignalR.Hubs.MessageHub;
 
 namespace TutorApplication.ApplicationCore.SignalR.Persistence
 {
 	public class VideoGroupChats
 	{
-		public  Dictionary<string, List<VideoState>> VideoGroups = new();
+		public Dictionary<string, List<VideoState>> VideoGroups = new();
 
 
-		public  Task<List<VideoState>?> GetVideoGroup(string videoGroupName)
+		public Task<List<VideoState>?> GetVideoGroup(string videoGroupName)
 		{
 			lock (VideoGroups)
 			{
-					var group = VideoGroups.GetValueOrDefault(videoGroupName);
-					return Task.FromResult(group);	
+				var group = VideoGroups.GetValueOrDefault(videoGroupName);
+				return Task.FromResult(group);
 			}
-			
+
 			throw new HubException("No Group Exists");
 		}
 
-		public  Task<bool> IsGroupVideoCallActive(string videoGroupName)
+		public Task<bool> IsGroupVideoCallActive(string videoGroupName)
 		{
 			if (VideoGroups.GetValueOrDefault(videoGroupName) != null)
 			{
@@ -35,7 +28,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Persistence
 			return Task.FromResult(false);
 		}
 
-		public  Task CreateVideoGroup(string videoGroupName, VideoState adminState)
+		public Task CreateVideoGroup(string videoGroupName, VideoState adminState)
 		{
 			lock (VideoGroups)
 			{
@@ -71,13 +64,13 @@ namespace TutorApplication.ApplicationCore.SignalR.Persistence
 					if (VideoGroups[videoGroupName].Any(u => u.id == memberState.id))
 					{
 						var index = VideoGroups[videoGroupName].FindIndex(u => u.id == memberState.id);
-						VideoGroups[videoGroupName][index]= memberState;
+						VideoGroups[videoGroupName][index] = memberState;
 					}
 					else
 					{
 						VideoGroups[videoGroupName].Add(memberState);
 					}
-					
+
 				}
 			}
 			return Task.CompletedTask;
@@ -93,7 +86,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Persistence
 					if (VideoGroups[videoGroupName].Any(u => u.id == command.elementId))
 					{
 						var index = VideoGroups[videoGroupName].FindIndex(u => u.id == command.elementId);
-						
+
 						var videoState = VideoGroups[videoGroupName][index];
 						if (command.command == "audio-toggle")
 						{

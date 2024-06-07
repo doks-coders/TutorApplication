@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace TutorApplication.SharedModels.Models
 {
-	
+
 	public class ResponseModel : ActionResult
 	{
 		public object Data { get; set; }

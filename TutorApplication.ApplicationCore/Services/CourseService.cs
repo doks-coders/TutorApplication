@@ -1,13 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Net;
 using System.Security.Claims;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
@@ -84,10 +78,10 @@ namespace TutorApplication.ApplicationCore.Services
 
 			var course = await _unitOfWork.Courses.GetItem(u => u.Id == id);
 
-			
+
 			bool isAdmin = false;
-			bool hasEnrolled= false;
-	
+			bool hasEnrolled = false;
+
 
 			var studentsBooked = await _unitOfWork.CourseStudents.GetItems(u => u.CourseId == course.Id);
 			int NumberOfBookedStudents = studentsBooked.Count();
@@ -96,7 +90,7 @@ namespace TutorApplication.ApplicationCore.Services
 			{
 				var userId = user.GetUserId();
 				isAdmin = (course.TutorId == userId);
-	
+
 				var exists = studentsBooked.Where(u => u.CourseId == course.Id && u.StudentId == userId).FirstOrDefault();
 				if (exists != null)
 				{
@@ -129,7 +123,7 @@ namespace TutorApplication.ApplicationCore.Services
 		{
 			return u =>
 			(u.CourseTitle.ToLower().Contains(pagination.CourseKeyWord.ToLower()) || pagination.CourseKeyWord == "All" || string.IsNullOrEmpty(pagination.CourseKeyWord) || u.About.ToLower().Contains(pagination.CourseKeyWord.ToLower()));
-		
+
 		}
 
 		//Add Extension here to fix repeatability
@@ -144,7 +138,7 @@ namespace TutorApplication.ApplicationCore.Services
 			items.Items = ((IEnumerable<Course>)items.Items).Select(e => new CourseResponse()
 			{
 				Id = e.Id,
-				NavigationId=e.NavigationId,
+				NavigationId = e.NavigationId,
 				CourseTitle = e.CourseTitle,
 				Currency = e.Currency,
 				About = e.About,

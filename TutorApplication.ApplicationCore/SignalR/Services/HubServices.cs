@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TutorApplication.ApplicationCore.Services.Interfaces;
-using TutorApplication.Infrastructure.Repositories.Interfaces;
+﻿using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Entities;
 
 namespace TutorApplication.ApplicationCore.SignalR.Services
 {
-	public class HubServices:IHubServices
+	public class HubServices : IHubServices
 	{
 		private readonly IUnitOfWork _unitOfWork;
-	
+
 		public HubServices(IUnitOfWork unitOfWork)
 		{
 			_unitOfWork = unitOfWork;
-	
+
 		}
 		public async Task<string> GetGroupWithConnectionId(string connectionId)
 		{

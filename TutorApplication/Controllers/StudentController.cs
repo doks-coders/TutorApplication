@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TutorApplication.ApplicationCore.Services.Interfaces;
-using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Extensions;
 using TutorApplication.SharedModels.Requests;
 
@@ -10,8 +9,8 @@ namespace TutorApplication.Controllers
 	public class StudentController : BaseController
 	{
 		private readonly IStudentService _studentService;
-		public StudentController(IStudentService studentService) 
-		{ 
+		public StudentController(IStudentService studentService)
+		{
 			_studentService = studentService;
 		}
 		[Authorize]
@@ -27,10 +26,10 @@ namespace TutorApplication.Controllers
 		[Authorize]
 		[HttpGet("join-course/{courseId:int}")]
 		public async Task<ActionResult> JoinCourse(int courseId)
-		=> await _studentService.JoinCourse(courseId,User.GetUserId());
+		=> await _studentService.JoinCourse(courseId, User.GetUserId());
 
 
-		
+
 
 	}
 }

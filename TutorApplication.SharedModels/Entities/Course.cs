@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TutorApplication.SharedModels.Entities
 {
-	public class Course:BaseEntity
+	public class Course : BaseEntity
 	{
 		public string CourseTitle { get; set; }
 		public string About { get; set; }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TutorApplication.Infrastructure.Data;
+﻿using TutorApplication.Infrastructure.Data;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 
 namespace TutorApplication.Infrastructure.Repositories
 {
-	public class UnitOfWork:IUnitOfWork
+	public class UnitOfWork : IUnitOfWork
 	{
 		public IApplicationUserRepository Users { get; }
 		public ICourseRepository Courses { get; }
@@ -18,7 +13,8 @@ namespace TutorApplication.Infrastructure.Repositories
 		public IGroupRepository Groups { get; }
 		private readonly ApplicationDbContext _context;
 
-		public UnitOfWork(ApplicationDbContext context) {
+		public UnitOfWork(ApplicationDbContext context)
+		{
 
 			_context = context;
 			Users = new ApplicationUserRepository(context);

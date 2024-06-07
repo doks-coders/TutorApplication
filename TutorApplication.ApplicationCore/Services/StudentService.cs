@@ -12,15 +12,15 @@ using TutorApplication.SharedModels.Responses;
 
 namespace TutorApplication.ApplicationCore.Services
 {
-	public class StudentService:IStudentService
-    {
-        private readonly IMediator _mediator;
+	public class StudentService : IStudentService
+	{
+		private readonly IMediator _mediator;
 		private readonly IUnitOfWork _unitOfWork;
-        public StudentService(IMediator mediator,IUnitOfWork unitOfWork) 
-        {
-            _mediator = mediator;
+		public StudentService(IMediator mediator, IUnitOfWork unitOfWork)
+		{
+			_mediator = mediator;
 			_unitOfWork = unitOfWork;
-        }
+		}
 
 		public Task<ResponseModel> GetStudent(int studentId)
 		{
@@ -45,12 +45,12 @@ namespace TutorApplication.ApplicationCore.Services
 				Id = user.Id,
 				Title = user.Title
 			};
-			var item = await _unitOfWork.CourseStudents.GetItems(u => u.StudentId == studentId,includeProperties: "Tutor,Course");
-			
+			var item = await _unitOfWork.CourseStudents.GetItems(u => u.StudentId == studentId, includeProperties: "Tutor,Course");
+
 			response.Courses = item.Select(e => new CourseResponse()
 			{
 				Id = e.Course.Id,
-				NavigationId= e.Course.NavigationId,
+				NavigationId = e.Course.NavigationId,
 				About = e.Course.About,
 				CourseTitle = e.Course.CourseTitle,
 				Price = e.Course.Price,
@@ -58,26 +58,26 @@ namespace TutorApplication.ApplicationCore.Services
 					.ConvertMemosToWeekChapters().Count()
 			}).ToList();
 
-			var tutors =  item.Select(e => new TutorResponse()
+			var tutors = item.Select(e => new TutorResponse()
 			{
 				Id = e.Tutor.Id,
-				NavigationId=e.Tutor.NavigationId,
+				NavigationId = e.Tutor.NavigationId,
 				About = e.Tutor.About,
 				Title = e.Tutor.Title,
 				Email = e.Tutor.Email,
 				FirstName = e.Tutor.FirstName,
 				LastName = e.Tutor.LastName,
-			}).GroupBy(e=>e.Id).Select(g => g.First()).ToList();
+			}).GroupBy(e => e.Id).Select(g => g.First()).ToList();
 
-		
+
 
 			response.Tutors = tutors.ToList();
 
 
 			return ResponseModel.Send(response);
-			
+
 		}
-		
+
 
 		public async Task<ResponseModel> JoinCourse(int courseId, int studentId)
 		{
@@ -91,7 +91,7 @@ namespace TutorApplication.ApplicationCore.Services
 				StudentId = studentId,
 				TutorId = course.TutorId,
 			};
-			if(await _unitOfWork.CourseStudents.AddItem(courseStudent))
+			if (await _unitOfWork.CourseStudents.AddItem(courseStudent))
 			{
 				if (await _unitOfWork.SaveChanges())
 				{
@@ -113,11 +113,11 @@ namespace TutorApplication.ApplicationCore.Services
 			user.Title = request.Title;
 			user.About = request.About;
 			user.isProfileUpdated = true;
-	
-			if(await _unitOfWork.SaveChanges())
+
+			if (await _unitOfWork.SaveChanges())
 			{
 				return ResponseModel.Send(user);
-			} 
+			}
 			throw new CustomException(ErrorCodes.ErrorWhileSaving);
 		}
 	}

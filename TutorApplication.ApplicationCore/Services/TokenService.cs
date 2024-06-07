@@ -10,8 +10,8 @@ using TutorApplication.SharedModels.Models;
 namespace TutorApplication.ApplicationCore.Services
 {
 
-	public class TokenService:ITokenService
-    {
+	public class TokenService : ITokenService
+	{
 		private readonly JwtOptions _jwtOptions;
 		private readonly SymmetricSecurityKey _symmetric;
 
@@ -39,10 +39,10 @@ namespace TutorApplication.ApplicationCore.Services
 				SigningCredentials = credentials,
 				Subject = identity,
 				Expires = DateTime.UtcNow.AddDays(7)
-				
+
 			};
 			JwtSecurityTokenHandler handler = new();
-			var token =  handler.CreateToken(tokenDescriptor);
+			var token = handler.CreateToken(tokenDescriptor);
 
 			return handler.WriteToken(token); ;
 		}

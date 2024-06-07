@@ -6,6 +6,6 @@ namespace TutorApplication.Controllers
 	[Route("api/[controller]")]
 	public class BaseController : ControllerBase
 	{
-		
+
 	}
 }

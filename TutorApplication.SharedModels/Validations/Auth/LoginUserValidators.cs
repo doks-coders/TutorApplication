@@ -1,16 +1,11 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TutorApplication.SharedModels.Requests;
 
 namespace TutorApplication.SharedModels.Validations.Auth
 {
-	public class LoginUserValidators:AbstractValidator<LoginUserRequest>
+	public class LoginUserValidators : AbstractValidator<LoginUserRequest>
 	{
-		public LoginUserValidators() 
+		public LoginUserValidators()
 		{
 			RuleFor(x => x.Email)
 		   .EmailAddress().WithMessage("Should be an Email")

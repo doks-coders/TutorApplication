@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 using TutorApplication.ApplicationCore.SignalR.Hubs;
 using TutorApplication.ApplicationCore.SignalR.Persistence;
 using TutorApplication.Extensions;
@@ -21,12 +19,12 @@ builder.Services.ConfigureIdentityServices(builder.Configuration);
 
 var connString = "";
 if (builder.Environment.IsDevelopment())
-{	
+{
 	connString = builder.Configuration.GetConnectionString("DefaultConnection");
 }
 else
 {
-	
+
 	// Use connection string provided at runtime by FlyIO.
 	var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 

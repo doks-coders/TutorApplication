@@ -6,7 +6,7 @@ namespace TutorApplication.Controllers
 	public class MessageController : BaseController
 	{
 		private readonly IMessageService _messageService;
-		public MessageController(IMessageService messageService) 
+		public MessageController(IMessageService messageService)
 		{
 			_messageService = messageService;
 		}

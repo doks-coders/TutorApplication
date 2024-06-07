@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using TutorApplication.SharedModels.Enums;
 
 namespace TutorApplication.SharedModels.Models
 {
-	
+
 
 	public class ErrorModel
 	{
@@ -25,8 +20,8 @@ namespace TutorApplication.SharedModels.Models
 			Message = message;
 			StackTrace = stackTrace;
 
-			string identifierKeyWord="";
-			string errorMessage="";
+			string identifierKeyWord = "";
+			string errorMessage = "";
 			if (message.Contains(":"))
 			{
 				identifierKeyWord = message.Split(":")[0];
@@ -37,7 +32,7 @@ namespace TutorApplication.SharedModels.Models
 				identifierKeyWord = "UnclassifiedError";
 				errorMessage = message;
 			}
-			 
+
 
 
 			ErrorIdentifiers identifier;
@@ -124,7 +119,7 @@ namespace TutorApplication.SharedModels.Models
 				},
 
 
-				
+
 
 
 			};

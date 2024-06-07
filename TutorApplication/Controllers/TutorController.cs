@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using TutorApplication.ApplicationCore.Services.Interfaces;
-using TutorApplication.ApplicationCore.Utils;
-using TutorApplication.Extensions;
-using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Extensions;
-using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 
 namespace TutorApplication.Controllers
@@ -15,7 +10,7 @@ namespace TutorApplication.Controllers
 	{
 		private readonly ITutorService _tutorService;
 		private readonly ICourseService _courseService;
-		public TutorController(ITutorService tutorService, ICourseService courseService) 
+		public TutorController(ITutorService tutorService, ICourseService courseService)
 		{
 			_tutorService = tutorService;
 			_courseService = courseService;
@@ -23,17 +18,17 @@ namespace TutorApplication.Controllers
 
 		[Authorize]
 		[HttpPost("create-course")]
-		public async Task<ActionResult> CreateCourse([FromBody]CreateCourseRequest request)
+		public async Task<ActionResult> CreateCourse([FromBody] CreateCourseRequest request)
 		=> await _courseService.CreateCourse(request, User.GetUserId());
 
 		[Authorize]
 		[HttpPost("update-course/{courseId:int}")]
-		public async Task<ActionResult> CreateCourse([FromBody] CreateCourseRequest request,int courseId)
+		public async Task<ActionResult> CreateCourse([FromBody] CreateCourseRequest request, int courseId)
 		=> await _courseService.UpdateCourse(request, User.GetUserId(), courseId);
 
 
 		[HttpGet("get-course-info/{courseId:int}")]
-		public async Task<ActionResult> GetCourseInfo( int courseId)
+		public async Task<ActionResult> GetCourseInfo(int courseId)
 		=> await _courseService.GetCourseInfo(courseId, User);
 
 		[HttpGet("search-courses")]

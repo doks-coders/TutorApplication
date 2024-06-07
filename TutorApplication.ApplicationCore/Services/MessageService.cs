@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TutorApplication.ApplicationCore.Services.Interfaces;
-using TutorApplication.ApplicationCore.SignalR.Services;
+﻿using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Models;
@@ -30,18 +23,22 @@ namespace TutorApplication.ApplicationCore.Services
 			await _unitOfWork.SaveChanges();
 			return ResponseModel.Send("Deleted");
 		}
-
+		/// <summary>
+		/// Get course group message
+		/// </summary>
+		/// <param name="courseGroupId">This is the course group Id</param>
+		/// <param name="senderId">This is the sender Id</param>
+		/// <returns></returns>
 		public async Task<List<MessageResponse>> GetCourseGroupMessage(int courseGroupId, int senderId)
 		{
 			var messages = await _unitOfWork.Messages.GetItems(
 				u => u.isCourseGroup == true
-			&&
-			u.CourseId == courseGroupId
-				);
+				&&
+				u.CourseId == courseGroupId);
 
 			var responseMessages = messages.OrderBy(m => m.Created).Select(u => new MessageResponse()
 			{
-				SenderId = (int) u.SenderId,
+				SenderId = (int)u.SenderId,
 				Content = u.Content,
 				Created = u.Created,
 				Id = u.Id
@@ -61,9 +58,9 @@ namespace TutorApplication.ApplicationCore.Services
 			&&
 			u.SenderId == recieverId
 			);
-			var responseMessages = messages.OrderBy(m => m.Created).Select(u=>new MessageResponse()
+			var responseMessages = messages.OrderBy(m => m.Created).Select(u => new MessageResponse()
 			{
-				SenderId = (int) u.SenderId,
+				SenderId = (int)u.SenderId,
 				Content = u.Content,
 				Created = u.Created,
 				Id = u.Id
@@ -105,10 +102,11 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<ResponseModel> GetContactsForStudents(int studentId)
 		{
-			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.StudentId == studentId,includeProperties: "Tutor,Course");
+			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.StudentId == studentId, includeProperties: "Tutor,Course");
 
-			var registeredCoursesTutors = courseStuds.GroupBy(u => u.TutorId).Select(e => e.First()).Select(u =>new DisplayMessageContact() {
-				DisplayName = u.Tutor.FirstName +" "+u.Tutor.LastName,
+			var registeredCoursesTutors = courseStuds.GroupBy(u => u.TutorId).Select(e => e.First()).Select(u => new DisplayMessageContact()
+			{
+				DisplayName = u.Tutor.FirstName + " " + u.Tutor.LastName,
 				Email = u.Tutor.Email,
 				SubText = "Tutor",
 				RecieverId = u.TutorId,
@@ -116,10 +114,10 @@ namespace TutorApplication.ApplicationCore.Services
 				IsGroup = false,
 				Id = u.Tutor.NavigationId,
 				IsOnline = false,
-				ImageUrl="",
-				lastTimeAvailable=""
-			
-			} );
+				ImageUrl = "",
+				lastTimeAvailable = ""
+
+			});
 
 			var registeredCourses = courseStuds.GroupBy(u => u.CourseId).Select(e => e.First()).Select(u => new DisplayMessageContact()
 			{
@@ -142,7 +140,7 @@ namespace TutorApplication.ApplicationCore.Services
 		{
 			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId, includeProperties: "Student,Course");
 
-			var registeredCoursesStudents = courseStuds.GroupBy(u=>u.StudentId).Select(e=>e.First()).Select(u => new DisplayMessageContact()
+			var registeredCoursesStudents = courseStuds.GroupBy(u => u.StudentId).Select(e => e.First()).Select(u => new DisplayMessageContact()
 			{
 				DisplayName = u.Student.FirstName + " " + u.Student.LastName,
 				Email = u.Student.Email,
@@ -154,7 +152,7 @@ namespace TutorApplication.ApplicationCore.Services
 				IsOnline = false,
 				ImageUrl = "",
 				lastTimeAvailable = "",
-				
+
 
 			});
 

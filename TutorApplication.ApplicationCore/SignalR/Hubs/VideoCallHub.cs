@@ -1,20 +1,10 @@
-﻿using Azure;
-using Azure.Core;
-using Microsoft.AspNetCore.SignalR;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
 using TutorApplication.ApplicationCore.SignalR.Persistence;
 using TutorApplication.ApplicationCore.SignalR.Services;
 using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Extensions;
 using TutorApplication.SharedModels.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TutorApplication.ApplicationCore.SignalR.Hubs
 {
@@ -41,21 +31,21 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			await _hubServices.AddConnectionToGroup(groupName, Context.ConnectionId);
 			await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-		
+
 			var isActive = await _videoGroupChats.IsGroupVideoCallActive(groupName);
 			await Clients.Group(groupName).SendAsync("IsGroupVideoCallActive", isActive);
 		}
-		
+
 		public async Task StartVideoCallGroup(VideoState request)
 		{
 			var session = GetSessionInfo();
-			
 
-	
+
+
 			string recieverName = await _hubServices.GetReceiver(session.IsGroup, session.RecieverId, session.CourseGroupId);
 			var groupName = GetVideoGroupName(session.SenderEmail, recieverName, session.IsGroup);
 			await _videoGroupChats.CreateVideoGroup(groupName, request);
-			var groupMembers =  await _videoGroupChats.GetVideoGroup(groupName);
+			var groupMembers = await _videoGroupChats.GetVideoGroup(groupName);
 			await Clients.Client(Context.ConnectionId).SendAsync("GetGroupMembers", groupMembers);
 			await Clients.Group(groupName).SendAsync("IsGroupVideoCallActive", true);
 
@@ -70,7 +60,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			var groupName = GetVideoGroupName(session.SenderEmail, recieverName, session.IsGroup);
 			await _videoGroupChats.RemoveVideoGroup(groupName);
 			var groupMembers = await _videoGroupChats.GetVideoGroup(groupName);
-			await Clients.Group(groupName).SendAsync("GetGroupMembers", groupMembers??new List<VideoState>());
+			await Clients.Group(groupName).SendAsync("GetGroupMembers", groupMembers ?? new List<VideoState>());
 			await Clients.Group(groupName).SendAsync("IsGroupVideoCallActive", false);
 
 		}
@@ -104,7 +94,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			var session = GetSessionInfo();
 			string recieverName = await _hubServices.GetReceiver(session.IsGroup, session.RecieverId, session.CourseGroupId);
 			var groupName = GetVideoGroupName(session.SenderEmail, recieverName, session.IsGroup);
-			await _videoGroupChats.CommandAction(groupName,command);
+			await _videoGroupChats.CommandAction(groupName, command);
 			await Clients.Group(groupName).SendAsync("CommandPassed", command);
 		}
 
@@ -127,9 +117,9 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			await Clients.Group(groupName).SendAsync("UserLeft", elementId);
 		}
 
-		private string GetVideoGroupName(string senderEmail,string recieverName, string isGroup)
+		private string GetVideoGroupName(string senderEmail, string recieverName, string isGroup)
 		{
-			return HubUtils.GetGroupName(senderEmail, recieverName, isGroup)+"videogroup";
+			return HubUtils.GetGroupName(senderEmail, recieverName, isGroup) + "videogroup";
 		}
 
 		private SessionInfo GetSessionInfo()

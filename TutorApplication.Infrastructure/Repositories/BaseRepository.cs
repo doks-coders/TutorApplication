@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using TutorApplication.Infrastructure.Data;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Models;
@@ -36,7 +31,7 @@ namespace TutorApplication.Infrastructure.Repositories
 			return await dbSetQueryable.Where(query).ToListAsync(); ;
 		}
 
-		
+
 
 
 		public async Task<PaginationResponse> GetPaginationItems(PaginationRequest request, Expression<Func<T, bool>> query, string? includeProperties = null)
@@ -68,7 +63,7 @@ namespace TutorApplication.Infrastructure.Repositories
 			{
 				throw new CustomException(ex.Message);
 			}
-			
+
 		}
 
 		public async Task<bool> AddItem(T entity)

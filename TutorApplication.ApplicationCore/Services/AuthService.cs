@@ -1,10 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Enums;
@@ -26,17 +20,17 @@ namespace TutorApplication.ApplicationCore.Services
 			_tokenService = tokenService;
 		}
 
-		
+
 		public async Task<ResponseModel> Login(LoginUserRequest request)
 		{
 
 			var validator = new LoginUserValidators();
 			var res = await validator.ValidateAsync(request);
 			if (!res.IsValid) throw new CustomException(res.Errors);
-			
+
 			if (!_userManager.Users.Any(u => u.Email == request.Email)) throw new CustomException(ErrorCodes.UserDoesNotExist);
 			var user = await _userManager.FindByEmailAsync(request.Email);
-			
+
 			var response = await _userManager.CheckPasswordAsync(user, request.Password);
 			if (!response) throw new CustomException(ErrorCodes.IncorrectPassword);
 
@@ -50,12 +44,12 @@ namespace TutorApplication.ApplicationCore.Services
 			var res = await validator.ValidateAsync(request);
 			if (!res.IsValid) throw new CustomException(res.Errors);
 
-			if (_userManager.Users.Any(u => u.Email == request.Email)) throw  new CustomException(ErrorCodes.UserExist);
+			if (_userManager.Users.Any(u => u.Email == request.Email)) throw new CustomException(ErrorCodes.UserExist);
 			ApplicationUser user = new();
 			user.Email = request.Email;
 			user.UserName = request.Email;
 			user.AccountType = request.AccountType;
-			var response =  await _userManager.CreateAsync(user, request.Password);
+			var response = await _userManager.CreateAsync(user, request.Password);
 
 			if (!response.Succeeded) throw new CustomException(response.Errors);
 			var apiResponse = new AuthUserResponse() { Token = _tokenService.CreateToken(user), UserName = user.Email };

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TutorApplication.SharedModels.Requests
+﻿namespace TutorApplication.SharedModels.Requests
 {
 	public class UpdateTutorProfileInformationRequest
 	{
@@ -14,4 +8,4 @@ namespace TutorApplication.SharedModels.Requests
 		public string About { get; set; }
 	}
 }
-	
+

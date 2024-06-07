@@ -1,21 +1,11 @@
-﻿using Azure.Core;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Linq.Expressions;
 using System.Text.Json;
-using System.Threading.Tasks;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Constants;
 using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Enums;
-using TutorApplication.SharedModels.Extensions;
 using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 using TutorApplication.SharedModels.Responses;
@@ -39,7 +29,7 @@ namespace TutorApplication.ApplicationCore.Services
 			   &&
 			   (u.AccountType == RoleConstants.Tutor)
 				&&
-			   (u.isProfileUpdated == true); 
+			   (u.isProfileUpdated == true);
 
 		}
 
@@ -98,7 +88,7 @@ namespace TutorApplication.ApplicationCore.Services
 				Courses = user.Courses.Select(e => new CourseResponse()
 				{
 					Id = e.Id,
-					NavigationId=e.NavigationId,
+					NavigationId = e.NavigationId,
 					About = e.About,
 					CourseTitle = e.CourseTitle,
 					Currency = e.Currency,
