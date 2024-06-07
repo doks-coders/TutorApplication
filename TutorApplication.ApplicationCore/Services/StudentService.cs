@@ -117,7 +117,7 @@ namespace TutorApplication.ApplicationCore.Services
 			if(await _unitOfWork.SaveChanges())
 			{
 				return ResponseModel.Send(user);
-			}
+			} 
 			throw new CustomException(ErrorCodes.ErrorWhileSaving);
 		}
 	}
