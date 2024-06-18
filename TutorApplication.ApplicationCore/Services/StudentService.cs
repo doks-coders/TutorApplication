@@ -22,12 +22,13 @@ namespace TutorApplication.ApplicationCore.Services
 			_unitOfWork = unitOfWork;
 		}
 
-		public Task<ResponseModel> GetStudent(int studentId)
+
+		public Task<ResponseModel> GetStudent(Guid studentId)
 		{
 			throw new NotImplementedException();
 		}
 
-		public async Task<ResponseModel> GetStudentExtended(int studentId)
+		public async Task<ResponseModel> GetStudentExtended(Guid studentId)
 		{
 			JsonSerializerOptions options = new()
 			{
@@ -79,7 +80,7 @@ namespace TutorApplication.ApplicationCore.Services
 		}
 
 
-		public async Task<ResponseModel> JoinCourse(int courseId, int studentId)
+		public async Task<ResponseModel> JoinCourse(Guid courseId, Guid studentId)
 		{
 			var checkCourseStudent = await _unitOfWork.CourseStudents.GetItem(u => u.CourseId == courseId && u.StudentId == studentId);
 			if (checkCourseStudent != null) return ResponseModel.Send("You have joined this course already");
@@ -102,7 +103,7 @@ namespace TutorApplication.ApplicationCore.Services
 			throw new CustomException(ErrorCodes.ErrorWhileAdding);
 		}
 
-		public async Task<ResponseModel> UpdateStudentProfileInfo(UpdateStudentProfileInformationRequest request, int userId)
+		public async Task<ResponseModel> UpdateStudentProfileInfo(UpdateStudentProfileInformationRequest request, Guid userId)
 		{
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == userId);
 			if (user == null) throw new CustomException(ErrorCodes.UserDoesNotExist);

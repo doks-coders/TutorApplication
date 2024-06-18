@@ -15,8 +15,7 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "AspNetRoles",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
 					Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
 					NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
 					ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
@@ -30,8 +29,7 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "AspNetUsers",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
 					FirstName = table.Column<string>(type: "text", nullable: true),
 					LastName = table.Column<string>(type: "text", nullable: true),
 					FullName = table.Column<string>(type: "text", nullable: true),
@@ -68,8 +66,7 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "Groups",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
 					Name = table.Column<string>(type: "text", nullable: false)
 				},
 				constraints: table =>
@@ -83,7 +80,7 @@ namespace TutorApplication.Infrastructure.Migrations
 				{
 					Id = table.Column<int>(type: "integer", nullable: false)
 						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-					RoleId = table.Column<int>(type: "integer", nullable: false),
+					RoleId = table.Column<Guid>(type: "uuid", nullable: false),
 					ClaimType = table.Column<string>(type: "text", nullable: true),
 					ClaimValue = table.Column<string>(type: "text", nullable: true)
 				},
@@ -104,7 +101,7 @@ namespace TutorApplication.Infrastructure.Migrations
 				{
 					Id = table.Column<int>(type: "integer", nullable: false)
 						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-					UserId = table.Column<int>(type: "integer", nullable: false),
+					UserId = table.Column<Guid>(type: "uuid", nullable: false),
 					ClaimType = table.Column<string>(type: "text", nullable: true),
 					ClaimValue = table.Column<string>(type: "text", nullable: true)
 				},
@@ -126,7 +123,7 @@ namespace TutorApplication.Infrastructure.Migrations
 					LoginProvider = table.Column<string>(type: "text", nullable: false),
 					ProviderKey = table.Column<string>(type: "text", nullable: false),
 					ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-					UserId = table.Column<int>(type: "integer", nullable: false)
+					UserId = table.Column<Guid>(type: "uuid", nullable: false)
 				},
 				constraints: table =>
 				{
@@ -143,10 +140,10 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "AspNetUserRoles",
 				columns: table => new
 				{
-					UserId = table.Column<int>(type: "integer", nullable: false),
-					RoleId = table.Column<int>(type: "integer", nullable: false),
-					AppUserId = table.Column<int>(type: "integer", nullable: false),
-					AppRoleId = table.Column<int>(type: "integer", nullable: false)
+					UserId = table.Column<Guid>(type: "uuid", nullable: false),
+					RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+					AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
+					AppRoleId = table.Column<Guid>(type: "uuid", nullable: false)
 				},
 				constraints: table =>
 				{
@@ -179,7 +176,7 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "AspNetUserTokens",
 				columns: table => new
 				{
-					UserId = table.Column<int>(type: "integer", nullable: false),
+					UserId = table.Column<Guid>(type: "uuid", nullable: false),
 					LoginProvider = table.Column<string>(type: "text", nullable: false),
 					Name = table.Column<string>(type: "text", nullable: false),
 					Value = table.Column<string>(type: "text", nullable: true)
@@ -199,14 +196,13 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "Course",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
 					CourseTitle = table.Column<string>(type: "text", nullable: false),
 					About = table.Column<string>(type: "text", nullable: false),
 					Price = table.Column<int>(type: "integer", nullable: false),
 					Currency = table.Column<string>(type: "text", nullable: false),
 					Memos = table.Column<string>(type: "text", nullable: false),
-					TutorId = table.Column<int>(type: "integer", nullable: false),
+					TutorId = table.Column<Guid>(type: "uuid", nullable: false),
 					NavigationId = table.Column<Guid>(type: "uuid", nullable: false),
 					Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
 					Updated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -226,13 +222,12 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "Messages",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
 					Content = table.Column<string>(type: "text", nullable: false),
-					SenderId = table.Column<int>(type: "integer", nullable: true),
-					RecieverId = table.Column<int>(type: "integer", nullable: true),
+					SenderId = table.Column<Guid>(type: "uuid", nullable: true),
+					RecieverId = table.Column<Guid>(type: "uuid", nullable: true),
 					isCourseGroup = table.Column<bool>(type: "boolean", nullable: false),
-					CourseId = table.Column<int>(type: "integer", nullable: false),
+					CourseId = table.Column<Guid>(type: "uuid", nullable: false),
 					isDeleted = table.Column<bool>(type: "boolean", nullable: false),
 					NavigationId = table.Column<Guid>(type: "uuid", nullable: false),
 					Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -257,9 +252,8 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "Connections",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-					GroupId = table.Column<int>(type: "integer", nullable: false),
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
+					GroupId = table.Column<Guid>(type: "uuid", nullable: false),
 					ConnectionURL = table.Column<string>(type: "text", nullable: false),
 					GroupName = table.Column<string>(type: "text", nullable: false)
 				},
@@ -277,11 +271,10 @@ namespace TutorApplication.Infrastructure.Migrations
 				name: "CourseStudents",
 				columns: table => new
 				{
-					Id = table.Column<int>(type: "integer", nullable: false)
-						.Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-					CourseId = table.Column<int>(type: "integer", nullable: false),
-					StudentId = table.Column<int>(type: "integer", nullable: false),
-					TutorId = table.Column<int>(type: "integer", nullable: false)
+					Id = table.Column<Guid>(type: "uuid", nullable: false),
+					CourseId = table.Column<Guid>(type: "uuid", nullable: false),
+					StudentId = table.Column<Guid>(type: "uuid", nullable: false),
+					TutorId = table.Column<Guid>(type: "uuid", nullable: false)
 				},
 				constraints: table =>
 				{

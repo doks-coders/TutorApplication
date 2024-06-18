@@ -5,15 +5,15 @@ namespace TutorApplication.SharedModels.Entities
 {
 	public class CourseStudent
 	{
-		public int Id { get; set; }
+		public Guid Id { get; set; }
 
-		public int CourseId { get; set; }
+		public Guid CourseId { get; set; }
 
 		[ForeignKey(nameof(CourseId))]
 		[DeleteBehavior(DeleteBehavior.NoAction)]
 		public Course Course { get; set; }
 
-		public int StudentId { get; set; }
+		public Guid StudentId { get; set; }
 
 		[ForeignKey(nameof(StudentId))]
 		[DeleteBehavior(DeleteBehavior.NoAction)]
@@ -21,7 +21,7 @@ namespace TutorApplication.SharedModels.Entities
 
 
 
-		public int TutorId { get; set; }
+		public Guid TutorId { get; set; }
 
 		[ForeignKey(nameof(TutorId))]
 		[DeleteBehavior(DeleteBehavior.NoAction)]

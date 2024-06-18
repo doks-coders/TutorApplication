@@ -8,6 +8,7 @@
 		public IMessageRepository Messages { get; }
 		public IConnectionRepository Connections { get; }
 		public IGroupRepository Groups { get; }
+		public IUserGroupRepository UserGroups { get; }
 		Task<bool> SaveChanges();
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace TutorApplication.SharedModels.Entities
 {
-	public class AppUserRole : IdentityUserRole<int>
+	public class AppUserRole : IdentityUserRole<Guid>
 	{
 		public ApplicationUser AppUser { get; set; }
 		public ApplicationRole AppRole { get; set; }

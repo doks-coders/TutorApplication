@@ -77,16 +77,19 @@ namespace TutorApplication.Infrastructure.Repositories
 			await _dbSet.AddRangeAsync(entities);
 		}
 
-		public async Task<bool> DeleteItem(T entity)
+		public Task<bool> DeleteItem(T entity)
 		{
 			var res = _dbSet.Remove(entity);
-			return res.State.HasFlag(EntityState.Deleted);
+			return Task.FromResult(res.State.HasFlag(EntityState.Deleted));
 		}
 
-		public async Task DeleteItems(IEnumerable<T> entities)
+		public Task DeleteItems(IEnumerable<T> entities)
 		{
 			_dbSet.RemoveRange(entities);
+			return Task.CompletedTask;
+
 		}
+
 
 
 

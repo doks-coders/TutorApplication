@@ -9,7 +9,7 @@ namespace TutorApplication.SharedModels.Entities
 		public int Price { get; set; }
 		public string Currency { get; set; }
 		public string Memos { get; set; }
-		public int TutorId { get; set; }
+		public Guid TutorId { get; set; }
 		[ForeignKey(nameof(TutorId))]
 		public ApplicationUser Tutor { get; set; }
 	}

@@ -22,13 +22,13 @@ namespace TutorApplication.Controllers
 		=> await _courseService.CreateCourse(request, User.GetUserId());
 
 		[Authorize]
-		[HttpPost("update-course/{courseId:int}")]
-		public async Task<ActionResult> CreateCourse([FromBody] CreateCourseRequest request, int courseId)
+		[HttpPost("update-course/{courseId}")]
+		public async Task<ActionResult> CreateCourse([FromBody] CreateCourseRequest request, Guid courseId)
 		=> await _courseService.UpdateCourse(request, User.GetUserId(), courseId);
 
 
-		[HttpGet("get-course-info/{courseId:int}")]
-		public async Task<ActionResult> GetCourseInfo(int courseId)
+		[HttpGet("get-course-info/{courseId}")]
+		public async Task<ActionResult> GetCourseInfo(Guid courseId)
 		=> await _courseService.GetCourseInfo(courseId, User);
 
 		[HttpGet("search-courses")]
@@ -41,12 +41,12 @@ namespace TutorApplication.Controllers
 		=> await _tutorService.GetTutors(request);
 
 
-		[HttpGet("get-tutor/{tutorId:int}")]
-		public async Task<ActionResult> GetTutor(int tutorId)
+		[HttpGet("get-tutor/{tutorId}")]
+		public async Task<ActionResult> GetTutor(Guid tutorId)
 		=> await _tutorService.GetTutor(tutorId);
 
-		[HttpGet("get-tutor-extended/{tutorId:int}")]
-		public async Task<ActionResult> GetTutorExtended(int tutorId)
+		[HttpGet("get-tutor-extended/{tutorId}")]
+		public async Task<ActionResult> GetTutorExtended(Guid tutorId)
 		=> await _tutorService.GetTutorExtended(tutorId);
 
 		[Authorize]

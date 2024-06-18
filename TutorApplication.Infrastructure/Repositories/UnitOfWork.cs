@@ -11,6 +11,7 @@ namespace TutorApplication.Infrastructure.Repositories
 		public IMessageRepository Messages { get; }
 		public IConnectionRepository Connections { get; }
 		public IGroupRepository Groups { get; }
+		public IUserGroupRepository UserGroups { get; }
 		private readonly ApplicationDbContext _context;
 
 		public UnitOfWork(ApplicationDbContext context)
@@ -23,6 +24,7 @@ namespace TutorApplication.Infrastructure.Repositories
 			Messages = new MessageRepository(context);
 			Connections = new ConnectionRepository(context);
 			Groups = new GroupRepository(context);
+			UserGroups = new UserGroupRepository(context);
 		}
 
 		public async Task<bool> SaveChanges()

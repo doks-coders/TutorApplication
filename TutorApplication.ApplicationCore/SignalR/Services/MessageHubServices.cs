@@ -1,5 +1,6 @@
 ﻿using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
+using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Requests;
 using TutorApplication.SharedModels.Responses.Messages;
 
@@ -16,12 +17,12 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			_messageService = messageService;
 		}
 
-		public async Task<MessageResponse> SendDirectMessage(MessageRequest request, int senderId, string groupName)
+		public async Task<MessageResponse> SendDirectMessage(MessageRequest request, Guid senderId, string groupName)
 		{
 			var directMessage = new DirectMessageRequest()
 			{
 				Content = request.Content,
-				RecieverId = (int)request.RecieverId
+				RecieverId = (Guid)request.RecieverId
 			};
 			var res = await _messageService.SendDirectMessage(directMessage, senderId);
 
@@ -34,13 +35,22 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			};
 		}
 
+		public async Task AddUserGroup(string groupName, string userName)
+		{
+			var userGroup = await _unitOfWork.UserGroups.GetItems(u => u.UserName == userName && u.GroupName == groupName);
+			if (userGroup.Count() == 0)
+			{
+				await _unitOfWork.UserGroups.AddItem(new UserGroup() { GroupName = groupName, UserName = userName });
+				await _unitOfWork.SaveChanges();
+			}
+		}
 
-		public async Task<MessageResponse> SendGroupMessage(MessageRequest request, int senderId, string groupName)
+		public async Task<MessageResponse> SendGroupMessage(MessageRequest request, Guid senderId, string groupName)
 		{
 			var courseGroupMessage = new CourseGroupMessageRequest()
 			{
 				Content = request.Content,
-				CourseGroupId = (int)request.CourseGroupId
+				CourseGroupId = (Guid)request.CourseGroupId
 			};
 			var res = await _messageService.SendCourseGroupMessage(courseGroupMessage, senderId);
 
@@ -53,14 +63,14 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			};
 		}
 
-		public async Task<List<MessageResponse>> GetCourseGroupMessages(int courseGroupId, int senderId)
+		public async Task<List<MessageResponse>> GetCourseGroupMessages(Guid courseGroupId, Guid senderId)
 		{
 			var responses = await _messageService.GetCourseGroupMessage(courseGroupId, senderId);
 
 			return responses;
 		}
 
-		public async Task<List<MessageResponse>> GetDirectMessages(int recieverId, int senderId)
+		public async Task<List<MessageResponse>> GetDirectMessages(Guid recieverId, Guid senderId)
 		{
 			var responses = await _messageService.GetDirectMessages(recieverId, senderId);
 
@@ -74,10 +84,11 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 
 	public interface IMessageHubServices
 	{
-		Task<MessageResponse> SendGroupMessage(MessageRequest request, int senderId, string groupName);
-		Task<MessageResponse> SendDirectMessage(MessageRequest request, int senderId, string groupName);
-		Task<List<MessageResponse>> GetCourseGroupMessages(int courseGroupId, int senderId);
-		Task<List<MessageResponse>> GetDirectMessages(int recieverId, int senderId);
+		Task<MessageResponse> SendGroupMessage(MessageRequest request, Guid senderId, string groupName);
+		Task<MessageResponse> SendDirectMessage(MessageRequest request, Guid senderId, string groupName);
+		Task<List<MessageResponse>> GetCourseGroupMessages(Guid courseGroupId, Guid senderId);
+		Task<List<MessageResponse>> GetDirectMessages(Guid recieverId, Guid senderId);
+		Task AddUserGroup(string groupName, string userName);
 	}
 
 

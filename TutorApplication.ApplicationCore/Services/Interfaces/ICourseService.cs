@@ -6,9 +6,9 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 {
 	public interface ICourseService
 	{
-		Task<ResponseModel> CreateCourse(CreateCourseRequest request, int tutorId);
-		Task<ResponseModel> UpdateCourse(CreateCourseRequest request, int userId, int courseId);
-		Task<ResponseModel> GetCourseInfo(int id, ClaimsPrincipal user);
+		Task<ResponseModel> CreateCourse(CreateCourseRequest request, Guid tutorId);
+		Task<ResponseModel> UpdateCourse(CreateCourseRequest request, Guid userId, Guid courseId);
+		Task<ResponseModel> GetCourseInfo(Guid id, ClaimsPrincipal user);
 		Task<ResponseModel> SearchCourses(PaginationRequest request);
 	}
 }

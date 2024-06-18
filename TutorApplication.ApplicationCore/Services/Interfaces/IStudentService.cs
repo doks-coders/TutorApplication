@@ -5,10 +5,10 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 {
 	public interface IStudentService
 	{
-		Task<ResponseModel> GetStudent(int studentId);
-		Task<ResponseModel> GetStudentExtended(int studentId);
-		Task<ResponseModel> JoinCourse(int courseId, int studentId);
-		Task<ResponseModel> UpdateStudentProfileInfo(UpdateStudentProfileInformationRequest request, int userId);
+		Task<ResponseModel> GetStudent(Guid studentId);
+		Task<ResponseModel> GetStudentExtended(Guid studentId);
+		Task<ResponseModel> JoinCourse(Guid courseId, Guid studentId);
+		Task<ResponseModel> UpdateStudentProfileInfo(UpdateStudentProfileInformationRequest request, Guid userId);
 
 	}
 }

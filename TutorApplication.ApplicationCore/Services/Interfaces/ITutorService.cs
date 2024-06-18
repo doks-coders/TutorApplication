@@ -7,8 +7,8 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 	{
 
 		Task<ResponseModel> GetTutors(PaginationRequest request);
-		Task<ResponseModel> GetTutor(int tutorId);
-		Task<ResponseModel> UpdateTutorProfileInfo(UpdateTutorProfileInformationRequest request, int userId);
-		Task<ResponseModel> GetTutorExtended(int tutorId);
+		Task<ResponseModel> GetTutor(Guid tutorId);
+		Task<ResponseModel> UpdateTutorProfileInfo(UpdateTutorProfileInformationRequest request, Guid userId);
+		Task<ResponseModel> GetTutorExtended(Guid tutorId);
 	}
 }

@@ -6,9 +6,9 @@ using TutorApplication.SharedModels.Entities;
 
 namespace TutorApplication.Infrastructure.Data
 {
-	public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int,
-	IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>,
-	IdentityRoleClaim<int>, IdentityUserToken<int>>
+	public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid,
+	IdentityUserClaim<Guid>, AppUserRole, IdentityUserLogin<Guid>,
+	IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
 		{
@@ -18,6 +18,7 @@ namespace TutorApplication.Infrastructure.Data
 		public DbSet<Message> Messages { get; set; }
 		public DbSet<Group> Groups { get; set; }
 		public DbSet<Connection> Connections { get; set; }
+		public DbSet<UserGroup> UserGroups { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

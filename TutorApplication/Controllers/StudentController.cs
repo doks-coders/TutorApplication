@@ -24,8 +24,8 @@ namespace TutorApplication.Controllers
 		=> await _studentService.GetStudentExtended(User.GetUserId());
 
 		[Authorize]
-		[HttpGet("join-course/{courseId:int}")]
-		public async Task<ActionResult> JoinCourse(int courseId)
+		[HttpGet("join-course/{courseId}")]
+		public async Task<ActionResult> JoinCourse(Guid courseId)
 		=> await _studentService.JoinCourse(courseId, User.GetUserId());
 
 

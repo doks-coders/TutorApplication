@@ -17,14 +17,13 @@ namespace TutorApplication.ApplicationCore.Services
 	public class CourseService : ICourseService
 	{
 		private readonly IUnitOfWork _unitOfWork;
+
 		public CourseService(IUnitOfWork unitOfWork)
 		{
 			_unitOfWork = unitOfWork;
 		}
 
-
-
-		public async Task<ResponseModel> CreateCourse(CreateCourseRequest request, int tutorId)
+		public async Task<ResponseModel> CreateCourse(CreateCourseRequest request, Guid tutorId)
 		{
 			var course = new Course()
 			{
@@ -48,7 +47,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 		}
 
-		public async Task<ResponseModel> UpdateCourse(CreateCourseRequest request, int userId, int courseId)
+		public async Task<ResponseModel> UpdateCourse(CreateCourseRequest request, Guid userId, Guid courseId)
 		{
 			var course = await _unitOfWork.Courses.GetItem(u => u.Id == courseId);
 			if (course == null) throw new CustomException(ErrorCodes.UserDoesNotExist);
@@ -68,7 +67,7 @@ namespace TutorApplication.ApplicationCore.Services
 			throw new CustomException(ErrorCodes.ErrorWhileSaving);
 		}
 
-		public async Task<ResponseModel> GetCourseInfo(int id, ClaimsPrincipal user)
+		public async Task<ResponseModel> GetCourseInfo(Guid id, ClaimsPrincipal user)
 		{
 
 			JsonSerializerOptions options = new()

@@ -7,19 +7,23 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 {
 	public interface IMessageService
 	{
-		Task<List<MessageResponse>> GetDirectMessages(int recieverId, int senderId);
+		Task<List<MessageResponse>> GetDirectMessages(Guid recieverId, Guid senderId);
 
-		Task<List<MessageResponse>> GetCourseGroupMessage(int courseGroupId, int senderId);
+		Task<List<MessageResponse>> GetCourseGroupMessage(Guid courseGroupId, Guid senderId);
 
-		Task<Message> SendDirectMessage(DirectMessageRequest request, int senderId);
+		Task<Message> SendDirectMessage(DirectMessageRequest request, Guid senderId);
 
-		Task<Message> SendCourseGroupMessage(CourseGroupMessageRequest request, int senderId);
+		Task<Message> SendCourseGroupMessage(CourseGroupMessageRequest request, Guid senderId);
 
-		Task<ResponseModel> DeleteMessage(int messageId);
+		Task<ResponseModel> DeleteMessage(Guid messageId);
 
-		Task<ResponseModel> GetContactsForStudents(int studentId);
+		Task<ResponseModel> GetContactsForStudents(Guid studentId);
 
-		Task<ResponseModel> GetContactsForTutors(int tutorId);
+		Task<ResponseModel> GetContactsForTutors(Guid tutorId);
+
+		Task<List<DisplayMessageContact>> GetContactsForStudentsWithHub(Guid studentId);
+
+		Task<List<DisplayMessageContact>> GetContactsForTutorswithHub(Guid tutorId);
 
 	}
 }

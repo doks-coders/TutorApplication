@@ -2,7 +2,6 @@
 using TutorApplication.ApplicationCore.SignalR.Persistence;
 using TutorApplication.ApplicationCore.SignalR.Services;
 using TutorApplication.ApplicationCore.Utils;
-using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Extensions;
 using TutorApplication.SharedModels.Models;
 
@@ -11,13 +10,11 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 	public class VideoCallHub : Hub
 	{
 		private readonly VideoGroupChats _videoGroupChats;
-		private readonly IUnitOfWork _unitOfWork;
 		private readonly IHubServices _hubServices;
 
-		public VideoCallHub(VideoGroupChats videoGroupChats, IUnitOfWork unitOfWork, IHubServices hubServices)
+		public VideoCallHub(VideoGroupChats videoGroupChats, IHubServices hubServices)
 		{
 			_videoGroupChats = videoGroupChats;
-			_unitOfWork = unitOfWork;
 			_hubServices = hubServices;
 		}
 
@@ -28,9 +25,8 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 			var groupName = GetVideoGroupName(session.SenderEmail, recieverName, session.IsGroup);
 
-			await _hubServices.AddConnectionToGroup(groupName, Context.ConnectionId);
+			await _hubServices.AddConnectionToGroup(groupName, Context.ConnectionId, Context.User.GetUserEmail());
 			await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-
 
 			var isActive = await _videoGroupChats.IsGroupVideoCallActive(groupName);
 			await Clients.Group(groupName).SendAsync("IsGroupVideoCallActive", isActive);
@@ -134,7 +130,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			var senderEmail = Context.User.GetUserEmail();
 			var senderId = Context.User.GetUserId();
 
-			return new SessionInfo() { IsGroup = isGroup, RecieverId = RecieverId, SenderEmail = senderEmail, SenderId = senderId, CourseGroupId = CourseGroupId };
+			return new SessionInfo() { IsGroup = isGroup, RecieverId = Guid.Parse(RecieverId), SenderEmail = senderEmail, SenderId = senderId, CourseGroupId = Guid.Parse(CourseGroupId) };
 		}
 
 	}

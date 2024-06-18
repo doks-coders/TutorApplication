@@ -3,10 +3,10 @@
 
 	public class SessionInfo
 	{
-		public string RecieverId { get; set; }
+		public Guid RecieverId { get; set; }
 		public string IsGroup { get; set; }
 		public string SenderEmail { get; set; }
-		public int SenderId { get; set; }
-		public string CourseGroupId { get; set; }
+		public Guid SenderId { get; set; }
+		public Guid CourseGroupId { get; set; }
 	}
 }

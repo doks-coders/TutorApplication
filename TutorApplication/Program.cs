@@ -14,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<VideoGroupChats>();
+builder.Services.AddSingleton<OnlineUsers>();
 builder.Services.ConfigureAppServices(builder.Configuration);
 builder.Services.ConfigureIdentityServices(builder.Configuration);
 
@@ -79,6 +80,7 @@ app.UseCors(u => u.AllowAnyHeader().AllowAnyMethod()
 app.UseMiddleware<ExceptionMiddleware>();
 app.MapHub<MessageHub>("hubs/message");
 app.MapHub<VideoCallHub>("hubs/video");
+app.MapHub<PresenceHub>("hubs/presence");
 app.MapFallbackToController("Index", "Fallback");
 app.UseHttpsRedirection();
 app.UseAuthentication();

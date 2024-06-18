@@ -12,8 +12,8 @@ using TutorApplication.Infrastructure.Data;
 namespace TutorApplication.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240604190205_Migration1")]
-    partial class Migration1
+    [Migration("20240610131411_Migration3")]
+    partial class Migration3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace TutorApplication.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,8 +39,8 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -49,7 +49,7 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,8 +63,8 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -73,7 +73,7 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -84,8 +84,8 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -94,10 +94,10 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -115,17 +115,17 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.AppUserRole", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("AppRoleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("AppRoleId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("AppUserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -140,11 +140,9 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.ApplicationRole", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -169,11 +167,9 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.ApplicationUser", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("About")
                         .HasColumnType("text");
@@ -273,20 +269,22 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Connection", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConnectionURL")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -299,11 +297,9 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Course", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("About")
                         .IsRequired()
@@ -330,8 +326,8 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TutorId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("TutorId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Updated")
                         .HasColumnType("timestamp with time zone");
@@ -345,20 +341,18 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.CourseStudent", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TutorId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("TutorId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -373,11 +367,9 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Group", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -390,18 +382,16 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Message", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("CourseId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -409,11 +399,11 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<Guid>("NavigationId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("RecieverId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("RecieverId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int?>("SenderId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("SenderId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Updated")
                         .HasColumnType("timestamp with time zone");
@@ -433,7 +423,28 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.UserGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserGroups");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("TutorApplication.SharedModels.Entities.ApplicationRole", null)
                         .WithMany()
@@ -442,7 +453,7 @@ namespace TutorApplication.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("TutorApplication.SharedModels.Entities.ApplicationUser", null)
                         .WithMany()
@@ -451,7 +462,7 @@ namespace TutorApplication.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("TutorApplication.SharedModels.Entities.ApplicationUser", null)
                         .WithMany()
@@ -460,7 +471,7 @@ namespace TutorApplication.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("TutorApplication.SharedModels.Entities.ApplicationUser", null)
                         .WithMany()

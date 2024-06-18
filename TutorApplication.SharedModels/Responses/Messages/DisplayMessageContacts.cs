@@ -3,8 +3,8 @@
 	public class DisplayMessageContact
 	{
 		public Guid Id { get; set; }
-		public int RecieverId { get; set; }
-		public int CourseGroupId { get; set; }
+		public Guid RecieverId { get; set; }
+		public Guid CourseGroupId { get; set; }
 		public string Email { get; set; }
 		public bool IsGroup { get; set; } = false;
 		public string DisplayName { get; set; }

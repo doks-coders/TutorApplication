@@ -83,7 +83,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Persistence
 			{
 				if (VideoGroups.GetValueOrDefault(videoGroupName) != null)
 				{
-					if (VideoGroups[videoGroupName].Any(u => u.id == command.elementId))
+					if (VideoGroups[videoGroupName].Exists(u => u.id == command.elementId))
 					{
 						var index = VideoGroups[videoGroupName].FindIndex(u => u.id == command.elementId);
 
@@ -112,7 +112,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Persistence
 			{
 				if (VideoGroups.GetValueOrDefault(videoGroupName) != null)
 				{
-					if (VideoGroups[videoGroupName].Any(u => u.id == elementId))
+					if (VideoGroups[videoGroupName].Exists(u => u.id == elementId))
 					{
 						var index = VideoGroups[videoGroupName].FindIndex(u => u.id == elementId);
 

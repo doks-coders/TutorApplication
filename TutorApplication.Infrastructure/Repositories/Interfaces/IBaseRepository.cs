@@ -11,5 +11,7 @@ namespace TutorApplication.Infrastructure.Repositories.Interfaces
 		Task<PaginationResponse> GetPaginationItems(PaginationRequest request, Expression<Func<T, bool>> query, string? includeProperties = null);
 		Task<bool> AddItem(T entity);
 		Task AddItems(IEnumerable<T> entities);
+		Task<bool> DeleteItem(T entity);
+		Task DeleteItems(IEnumerable<T> entities);
 	}
 }

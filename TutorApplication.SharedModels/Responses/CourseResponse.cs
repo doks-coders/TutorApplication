@@ -4,7 +4,7 @@ namespace TutorApplication.SharedModels.Responses
 {
 	public class CourseResponse
 	{
-		public int Id { get; set; }
+		public Guid Id { get; set; }
 		public Guid NavigationId { get; set; }
 		public string CourseTitle { get; set; }
 		public string About { get; set; }

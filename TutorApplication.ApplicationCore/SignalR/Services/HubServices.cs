@@ -12,6 +12,13 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			_unitOfWork = unitOfWork;
 
 		}
+		public async Task RemoveConnection(string userName)
+		{
+			var connection = await _unitOfWork.Connections.GetItems(u => u.Username == userName);
+			await _unitOfWork.Connections.DeleteItems(connection);
+			await _unitOfWork.SaveChanges();
+
+		}
 		public async Task<string> GetGroupWithConnectionId(string connectionId)
 		{
 			var connection = await _unitOfWork.Connections.GetItem(u => u.ConnectionURL == connectionId);
@@ -19,7 +26,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			return connection.GroupName;
 		}
 
-		public async Task AddConnectionToGroup(string groupName, string connectionId)
+		public async Task AddConnectionToGroup(string groupName, string connectionId, string userName)
 		{
 			Group? group = await _unitOfWork.Groups.GetItem(e => e.Name == groupName);
 			if (group == null)
@@ -28,7 +35,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			}
 			else
 			{
-				var item = new Connection() { ConnectionURL = connectionId, GroupName = groupName, GroupId = group.Id };
+				var item = new Connection() { ConnectionURL = connectionId, GroupName = groupName, GroupId = group.Id, Username = userName };
 				await _unitOfWork.Connections.AddItem(item);
 			}
 			await _unitOfWork.SaveChanges();
@@ -36,13 +43,13 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 		}
 
 
-		public async Task<string> GetReceiver(string IsGroup, string RecieverId, string CourseGroupId)
+		public async Task<string> GetReceiver(string IsGroup, Guid RecieverId, Guid CourseGroupId)
 		{
 
 			string recieverName = "";
 			if (IsGroup == "false")
 			{
-				var reciever = await _unitOfWork.Users.GetItem(u => u.Id == int.Parse(RecieverId));
+				var reciever = await _unitOfWork.Users.GetItem(u => u.Id == RecieverId);
 				if (reciever != null)
 				{
 					recieverName = reciever.Email;
@@ -50,7 +57,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			}
 			else
 			{
-				var reciever = await _unitOfWork.Courses.GetItem(u => u.Id == int.Parse(CourseGroupId));
+				var reciever = await _unitOfWork.Courses.GetItem(u => u.Id == CourseGroupId);
 				if (reciever != null)
 				{
 					recieverName = reciever.CourseTitle;
@@ -64,8 +71,9 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 	public interface IHubServices
 	{
 		Task<string> GetGroupWithConnectionId(string connectionId);
-		Task AddConnectionToGroup(string groupName, string connectionId);
-		Task<string> GetReceiver(string IsGroup, string RecieverId, string CourseGroupId);
+		Task AddConnectionToGroup(string groupName, string connectionId, string userName);
+		Task<string> GetReceiver(string IsGroup, Guid RecieverId, Guid CourseGroupId);
+		Task RemoveConnection(string userName);
 
 	}
 }

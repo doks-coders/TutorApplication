@@ -49,7 +49,7 @@ namespace TutorApplication.ApplicationCore.Services
 			return ResponseModel.Send(items);
 		}
 
-		public async Task<ResponseModel> GetTutor(int tutorId)
+		public async Task<ResponseModel> GetTutor(Guid tutorId)
 		{
 			var item = await _unitOfWork.Users.GetItem(u => u.Id == tutorId);
 			if (item == null) throw new CustomException(ErrorCodes.UserDoesNotExist);
@@ -65,7 +65,7 @@ namespace TutorApplication.ApplicationCore.Services
 			return ResponseModel.Send(response);
 		}
 
-		public async Task<ResponseModel> GetTutorExtended(int tutorId)
+		public async Task<ResponseModel> GetTutorExtended(Guid tutorId)
 		{
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == tutorId, includeProperties: "Courses");
 
@@ -114,7 +114,7 @@ namespace TutorApplication.ApplicationCore.Services
 		}
 
 
-		public async Task<ResponseModel> UpdateTutorProfileInfo(UpdateTutorProfileInformationRequest request, int userId)
+		public async Task<ResponseModel> UpdateTutorProfileInfo(UpdateTutorProfileInformationRequest request, Guid userId)
 		{
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == userId);
 			if (user == null) throw new CustomException(ErrorCodes.UserDoesNotExist);
