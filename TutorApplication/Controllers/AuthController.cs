@@ -18,5 +18,10 @@ namespace TutorApplication.Controllers
 		[HttpPost("login")]
 		public async Task<ActionResult> Login([FromBody] LoginUserRequest loginUserRequest)
 		=> await _authService.Login(loginUserRequest);
+
+
+		[HttpGet("user-exists")]
+		public async Task<ActionResult> CheckUserExistence()
+		=> await _authService.UserExist(User);
 	}
 }

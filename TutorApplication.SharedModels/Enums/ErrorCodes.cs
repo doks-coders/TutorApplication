@@ -3,6 +3,7 @@
 	public enum ErrorCodes
 	{
 		IncorrectPassword,
+		UserAuthDoesNotExist,
 		UserDoesNotExist,
 		CourseDoesNotExist,
 		UserExist,

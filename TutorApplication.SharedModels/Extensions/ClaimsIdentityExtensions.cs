@@ -8,7 +8,6 @@ namespace TutorApplication.SharedModels.Extensions
 		{
 			return Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier).Value);
 		}
-
 		public static string GetUserEmail(this ClaimsPrincipal user)
 		{
 			return user.FindFirst(ClaimTypes.Name).Value;
@@ -17,7 +16,5 @@ namespace TutorApplication.SharedModels.Extensions
 		{
 			return user.FindFirst(ClaimTypes.Role).Value;
 		}
-
-
 	}
 }

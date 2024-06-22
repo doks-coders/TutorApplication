@@ -31,7 +31,12 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			Group? group = await _unitOfWork.Groups.GetItem(e => e.Name == groupName);
 			if (group == null)
 			{
-				await _unitOfWork.Groups.AddItem(new Group { Name = groupName });
+				var newGroup = new Group { Name = groupName };
+				await _unitOfWork.Groups.AddItem(newGroup);
+				await _unitOfWork.SaveChanges();
+
+				var item = new Connection() { ConnectionURL = connectionId, GroupName = groupName, GroupId = newGroup.Id, Username = userName };
+				await _unitOfWork.Connections.AddItem(item);
 			}
 			else
 			{

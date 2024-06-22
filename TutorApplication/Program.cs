@@ -94,7 +94,9 @@ using (var scope = app.Services.CreateScope())
 
 	try
 	{
+	
 		var db = services.GetRequiredService<ApplicationDbContext>();
+		//await db.Database.EnsureDeletedAsync();
 		await db.Database.MigrateAsync();
 		var logger = services.GetService<ILogger<Program>>();
 		logger.LogInformation("Migration Successfull");

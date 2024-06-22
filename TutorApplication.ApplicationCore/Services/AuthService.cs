@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Enums;
+using TutorApplication.SharedModels.Extensions;
 using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 using TutorApplication.SharedModels.Responses;
@@ -20,6 +23,16 @@ namespace TutorApplication.ApplicationCore.Services
 			_tokenService = tokenService;
 		}
 
+		public async Task<ResponseModel> UserExist(ClaimsPrincipal user)
+		{
+			string? email = null;
+			try
+			{
+				email = user.GetUserEmail();
+			}catch(Exception ex){}
+			if (!_userManager.Users.Any(u => u.Email == email)) return ResponseModel.Send("User Does Not Exist");
+			return ResponseModel.Send("User Exists");
+		}
 
 		public async Task<ResponseModel> Login(LoginUserRequest request)
 		{

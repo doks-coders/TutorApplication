@@ -24,16 +24,25 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 		public override async Task OnConnectedAsync()
 		{
-			var onlineUser = new OnlineUser { ConnectionId = Context.ConnectionId, UserName = Context.User.GetUserEmail() };
-			await _onlineUsers.AddNewOnlineUser(onlineUser);
-			await GetUpdatedDisplayContacts(true);
+			try
+			{
+				var onlineUser = new OnlineUser { ConnectionId = Context.ConnectionId, UserName = Context.User.GetUserEmail() };
+				await _onlineUsers.AddNewOnlineUser(onlineUser);
+				await GetUpdatedDisplayContacts(true);
+			}catch(Exception ex){}
+			
 
 		}
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
-			await _onlineUsers.RemoveNewOnlineUser(Context.User.GetUserEmail());
-			await GetUpdatedDisplayContacts(true);
+			try
+			{
+				await _onlineUsers.RemoveNewOnlineUser(Context.User.GetUserEmail());
+				await GetUpdatedDisplayContacts(true);
+			}
+			catch(Exception ex) { }
+			
 		}
 
 		public async Task GetUpdatedDisplayContacts(bool updateOtherusers)

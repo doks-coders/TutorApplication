@@ -117,10 +117,18 @@ namespace TutorApplication.SharedModels.Models
 						{ErrorKeyWord,((int)HttpStatusCode.BadRequest).ToString() }
 					}
 				},
+				{
+					ErrorCodes.UserAuthDoesNotExist,
+					new()
+					{
+						{MessageKeyWord,"User Auth Does Not Exist"},
+						{ErrorKeyWord,((int)HttpStatusCode.BadRequest).ToString() }
+					}
+				},
 
 
 
-
+				
 
 			};
 	}

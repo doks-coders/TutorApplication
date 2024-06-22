@@ -91,6 +91,8 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			string recieverName = await _hubServices.GetReceiver(session.IsGroup, session.RecieverId, session.CourseGroupId);
 			var groupName = HubUtils.GetGroupName(session.SenderEmail, recieverName, session.IsGroup);
 
+			var connections = await _unitOfWork.Connections.GetItems(u => u.GroupName == groupName);
+
 			var messageConnections = await _unitOfWork.Connections.GetItems(u => u.GroupName == groupName && u.Username != Context.User.GetUserEmail());
 			var messageConnectionsIds = messageConnections.Select(u => u.ConnectionURL).ToList();
 			await Clients.Clients(messageConnectionsIds).SendAsync("IsTyping", isTyping);
