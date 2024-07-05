@@ -16,5 +16,6 @@ namespace TutorApplication.SharedModels.Responses
 		public int NumberOfBookedStudents { get; set; }
 		public bool? isAdmin { get; set; } = false;
 		public List<Memo>? Memos { get; set; }
+		public string TutorName { get; set; }
 	}
 }
