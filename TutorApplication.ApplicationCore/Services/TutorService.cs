@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Text.Json;
+using TutorApplication.ApplicationCore.Extensions;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
@@ -67,16 +68,16 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<ResponseModel> GetTutorExtended(Guid tutorId)
 		{
-			var user = await _unitOfWork.Users.GetItem(u => u.Id == tutorId, includeProperties: "Courses");
+			var user = await _unitOfWork.Users.GetItem(u=>u.Id==tutorId);
+			var courses = await _unitOfWork.Courses.GetOneTutorCourse(tutorId);
 
-			if (user == null) throw new CustomException(ErrorCodes.UserDoesNotExist);
+			//Tutor
 			JsonSerializerOptions options = new()
 			{
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 			};
 
 			var courseStudents = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId, includeProperties: "Student");
-
 			var response = new TutorExtendedResponse()
 			{
 				NavigationId = user.NavigationId,
@@ -85,18 +86,8 @@ namespace TutorApplication.ApplicationCore.Services
 				About = user.About,
 				Title = user.Title,
 				Email = user.Email,
-				Courses = user.Courses.Select(e => new CourseResponse()
-				{
-					Id = e.Id,
-					NavigationId = e.NavigationId,
-					About = e.About,
-					CourseTitle = e.CourseTitle,
-					Currency = e.Currency,
-					Price = e.Price,
-					Weeks = JsonSerializer.Deserialize<IEnumerable<Memo>>(e.Memos, options)
-					.ConvertMemosToWeekChapters().Count()
-				}).ToList(),
 
+				Courses = courses.ConvertCourseToCourseResponse(),
 				Students = courseStudents.Select(u => new StudentResponse()
 				{
 					Id = u.StudentId,
@@ -108,6 +99,22 @@ namespace TutorApplication.ApplicationCore.Services
 				}).GroupBy(u => u.Id).Select(u => u.First()).ToList()
 			};
 
+			/*
+			 .Select(e => new CourseResponse()
+				{
+					Id = e.Id,
+					NavigationId = e.NavigationId,
+					About = e.About,
+					CourseTitle = e.CourseTitle,
+					Currency = e.Currency,
+					Price = e.Price,
+					NumberOfBookedStudents = e.Students.Count(),
+					TutorName = user.LastName + " " + user.FirstName,
+					Weeks = JsonSerializer.Deserialize<IEnumerable<Memo>>(e.Memos, options)
+					.ConvertMemosToWeekChapters().Count()
+				}).ToList(),
+
+			 */
 
 
 			return ResponseModel.Send(response);

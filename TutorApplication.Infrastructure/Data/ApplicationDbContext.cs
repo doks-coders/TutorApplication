@@ -15,6 +15,7 @@ namespace TutorApplication.Infrastructure.Data
 
 		}
 		public DbSet<CourseStudent> CourseStudents { get; set; }
+		public DbSet<Course> Courses{ get; set; }
 		public DbSet<Message> Messages { get; set; }
 		public DbSet<Group> Groups { get; set; }
 		public DbSet<Connection> Connections { get; set; }

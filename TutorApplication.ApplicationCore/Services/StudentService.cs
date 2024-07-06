@@ -8,6 +8,7 @@ using TutorApplication.SharedModels.Enums;
 using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 using TutorApplication.SharedModels.Responses;
+using TutorApplication.ApplicationCore.Extensions;
 
 
 namespace TutorApplication.ApplicationCore.Services
@@ -37,6 +38,8 @@ namespace TutorApplication.ApplicationCore.Services
 
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == studentId);
 			if (user == null) throw new CustomException(ErrorCodes.UserDoesNotExist);
+
+
 			var response = new StudentExtendedResponse()
 			{
 				About = user.About,
@@ -46,18 +49,10 @@ namespace TutorApplication.ApplicationCore.Services
 				Id = user.Id,
 				Title = user.Title
 			};
-			var item = await _unitOfWork.CourseStudents.GetItems(u => u.StudentId == studentId, includeProperties: "Tutor,Course");
+			var item = await _unitOfWork.CourseStudents.GetOneCourseStudentForStudent(studentId);
+			
+			response.Courses = item.ConvertCourseToCourseResponse();
 
-			response.Courses = item.Select(e => new CourseResponse()
-			{
-				Id = e.Course.Id,
-				NavigationId = e.Course.NavigationId,
-				About = e.Course.About,
-				CourseTitle = e.Course.CourseTitle,
-				Price = e.Course.Price,
-				Weeks = JsonSerializer.Deserialize<IEnumerable<Memo>>(e.Course.Memos, options)
-					.ConvertMemosToWeekChapters().Count()
-			}).ToList();
 
 			var tutors = item.Select(e => new TutorResponse()
 			{

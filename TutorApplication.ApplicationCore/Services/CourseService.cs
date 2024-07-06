@@ -2,6 +2,7 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
+using TutorApplication.ApplicationCore.Extensions;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
@@ -25,16 +26,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<ResponseModel> CreateCourse(CreateCourseRequest request, Guid tutorId)
 		{
-			var course = new Course()
-			{
-				TutorId = tutorId,
-				CourseTitle = request.CourseTitle,
-				Currency = request.Currency,
-				Memos = request.Memos,
-				About = request.About,
-				Price = request.Price,
-			};
-
+			var course = request.ConvertCourseRequestToCourse(tutorId);
 			if (await _unitOfWork.Courses.AddItem(course))
 			{
 				if (await _unitOfWork.SaveChanges())
@@ -75,7 +67,7 @@ namespace TutorApplication.ApplicationCore.Services
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 			};
 
-			var course = await _unitOfWork.Courses.GetItem(u => u.Id == id);
+			var course = await _unitOfWork.Courses.GetItem(u => u.Id == id,includeProperties: "Tutor,Students");
 
 
 			bool isAdmin = false;
@@ -83,7 +75,6 @@ namespace TutorApplication.ApplicationCore.Services
 
 
 			var studentsBooked = await _unitOfWork.CourseStudents.GetItems(u => u.CourseId == course.Id);
-			int NumberOfBookedStudents = studentsBooked.Count();
 
 			try
 			{
@@ -99,22 +90,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 			catch (Exception) { }
 			var memos = JsonSerializer.Deserialize<IEnumerable<Memo>>(course.Memos, options);
-			var response = new CourseResponse()
-			{
-				Id = course.Id,
-				NavigationId = course.NavigationId,
-				About = course.About,
-				CourseTitle = course.CourseTitle,
-				Currency = course.Currency,
-				Price = course.Price,
-				isAdmin = isAdmin,
-				hasEnrolled = hasEnrolled,
-				WeeklyOutline = memos.ConvertMemosToWeekChapters(),
-				Memos = memos.ToList(),
-				Weeks = memos
-					.ConvertMemosToWeekChapters().Count(),
-				NumberOfBookedStudents = NumberOfBookedStudents
-			};
+			var response = course.ConvertCourseToCourseExtendedResponse(memos, isAdmin, hasEnrolled);
 			return ResponseModel.Send(response);
 		}
 
@@ -128,23 +104,9 @@ namespace TutorApplication.ApplicationCore.Services
 		//Add Extension here to fix repeatability
 		public async Task<ResponseModel> SearchCourses(PaginationRequest request)
 		{
-			var items = await _unitOfWork.Courses.GetPaginationItems(request, Search(request));
+			var items = await _unitOfWork.Courses.GetPaginationItems(request, Search(request),includeProperties: "Tutor,Students");
 
-			JsonSerializerOptions options = new()
-			{
-				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-			};
-			items.Items = ((IEnumerable<Course>)items.Items).Select(e => new CourseResponse()
-			{
-				Id = e.Id,
-				NavigationId = e.NavigationId,
-				CourseTitle = e.CourseTitle,
-				Currency = e.Currency,
-				About = e.About,
-				Price = e.Price,
-				Weeks = JsonSerializer.Deserialize<IEnumerable<Memo>>(e.Memos, options)
-					.ConvertMemosToWeekChapters().Count()
-			}).ToList();
+			items.Items = ((IEnumerable<Course>)items.Items).ConvertCourseToCourseResponse();
 
 			return ResponseModel.Send(items);
 		}

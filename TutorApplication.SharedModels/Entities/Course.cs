@@ -12,5 +12,7 @@ namespace TutorApplication.SharedModels.Entities
 		public Guid TutorId { get; set; }
 		[ForeignKey(nameof(TutorId))]
 		public ApplicationUser Tutor { get; set; }
+
+		public List<CourseStudent> Students { get; set; } = new List<CourseStudent>();
 	}
 }

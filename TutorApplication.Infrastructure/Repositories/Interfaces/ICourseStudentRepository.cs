@@ -4,5 +4,6 @@ namespace TutorApplication.Infrastructure.Repositories.Interfaces
 {
 	public interface ICourseStudentRepository : IBaseRepository<CourseStudent>
 	{
+		Task<IEnumerable<CourseStudent>> GetOneCourseStudentForStudent(Guid studentId);
 	}
 }
