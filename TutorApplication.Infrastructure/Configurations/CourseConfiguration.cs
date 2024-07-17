@@ -14,6 +14,9 @@ namespace TutorApplication.Infrastructure.Configurations
 		public void Configure(EntityTypeBuilder<Course> builder)
 		{
 			builder.HasMany(u=>u.Students).WithOne(u=> u.Course).HasForeignKey(u=>u.CourseId).OnDelete(DeleteBehavior.NoAction);
+
+			builder.HasOne(u => u.Photo).WithOne(u => u.Course).OnDelete(DeleteBehavior.NoAction);
+
 		}
 	}
 }

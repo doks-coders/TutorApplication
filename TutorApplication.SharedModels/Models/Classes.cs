@@ -18,13 +18,17 @@ namespace TutorApplication.SharedModels.Models
 		public string Timestamp { get; set; }
 		public List<ClassResponse> Classes { get; set; }
 	}
-	public class ClassResponse
+	public class ClassResponse : Memo
 	{
-		public string CourseId { get; set; }
+		public Guid CourseId { get; set; }
+		
+			public string ImageUrl { get; set; }
 		public string Timestamp { get; set; }
 		public string CourseTitle { get; set; }
-		public string MemoInfo { get; set; }
 		public string TutorName { get; set; }
+		public int NumberOfBookedStudents { get; set; }
+
+		public Guid CourseNavigationId { get; set; }
 	}
 }
 

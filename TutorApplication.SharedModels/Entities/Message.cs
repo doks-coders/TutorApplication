@@ -1,4 +1,7 @@
-﻿namespace TutorApplication.SharedModels.Entities
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TutorApplication.SharedModels.Entities
 {
 	public class Message : BaseEntity
 	{
@@ -6,10 +9,15 @@
 
 		public Guid? SenderId { get; set; }
 
+		[ForeignKey(nameof(SenderId))]
+		[DeleteBehavior(DeleteBehavior.NoAction)]
 		public ApplicationUser Sender { get; set; }
 
+		
 		public Guid? RecieverId { get; set; }
 
+		[ForeignKey(nameof(RecieverId))]
+		[DeleteBehavior(DeleteBehavior.NoAction)]
 		public ApplicationUser Reciever { get; set; }
 
 		public bool isCourseGroup { get; set; } = false;

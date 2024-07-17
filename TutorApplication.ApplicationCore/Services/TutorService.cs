@@ -44,7 +44,8 @@ namespace TutorApplication.ApplicationCore.Services
 				LastName = e.LastName,
 				About = e.About,
 				Title = e.Title,
-				Email = e.Email
+				Email = e.Email,
+				ImageUrl = e.ImageUrl
 			}).ToList();
 
 			return ResponseModel.Send(items);
@@ -60,7 +61,8 @@ namespace TutorApplication.ApplicationCore.Services
 				LastName = item.LastName,
 				About = item.About,
 				Title = item.Title,
-				Email = item.Email
+				Email = item.Email,
+				ImageUrl = item.ImageUrl,
 			};
 
 			return ResponseModel.Send(response);
@@ -68,7 +70,74 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<ResponseModel> GetTutorExtended(Guid tutorId)
 		{
-			var user = await _unitOfWork.Users.GetItem(u=>u.Id==tutorId);
+			var user = await _unitOfWork.Users.GetItem(u => u.Id == tutorId);
+			if(user.AccountType != "Student")
+			{
+				var tutorResponse = await GetTutorDetails(tutorId);
+				return ResponseModel.Send(tutorResponse);
+
+			}
+			var studentResponse = await GetStudentExtended(tutorId);
+
+			return ResponseModel.Send(studentResponse);
+		}
+
+
+		public async Task<StudentExtendedResponse> GetStudentExtended(Guid studentId)
+		{
+			JsonSerializerOptions options = new()
+			{
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			};
+
+			var user = await _unitOfWork.Users.GetItem(u => u.Id == studentId);
+			if (user == null) throw new CustomException(ErrorCodes.UserDoesNotExist);
+
+
+			var response = new StudentExtendedResponse()
+			{
+				About = user.About,
+				NavigationId = user.NavigationId,
+				Email = user.Email,
+				Interests = user.Interests,
+				ImageUrl = user.ImageUrl,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				AccountType = user.AccountType,
+				Id = user.Id,
+				Title = user.Title,
+			};
+			var item = await _unitOfWork.CourseStudents.GetOneCourseStudentForStudent(studentId);
+
+			response.Courses = item.ConvertCourseToCourseResponse();
+
+
+			var tutors = item.Select(e => new TutorResponse()
+			{
+				Id = e.Tutor.Id,
+				NavigationId = e.Tutor.NavigationId,
+				About = e.Tutor.About,
+				Title = e.Tutor.Title,
+				ImageUrl = e.Tutor.ImageUrl,
+				Email = e.Tutor.Email,
+				FirstName = e.Tutor.FirstName,
+				LastName = e.Tutor.LastName,
+			}).GroupBy(e => e.Id).Select(g => g.First()).ToList();
+
+
+
+			response.Tutors = tutors.ToList();
+
+
+			return response;
+
+		}
+
+
+		private async Task<TutorExtendedResponse> GetTutorDetails(Guid tutorId)
+		{
+
+			var user = await _unitOfWork.Users.GetItem(u => u.Id == tutorId);
 			var courses = await _unitOfWork.Courses.GetOneTutorCourse(tutorId);
 
 			//Tutor
@@ -77,47 +146,35 @@ namespace TutorApplication.ApplicationCore.Services
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 			};
 
-			var courseStudents = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId, includeProperties: "Student");
+			var courseStudents = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId && u.StudentId != tutorId, includeProperties: "Student");
 			var response = new TutorExtendedResponse()
 			{
+				Id = user.Id,
 				NavigationId = user.NavigationId,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				About = user.About,
 				Title = user.Title,
 				Email = user.Email,
-
+				Interests = user.Interests,
+				ImageUrl = user.ImageUrl,
+				AccountType = user.AccountType,
 				Courses = courses.ConvertCourseToCourseResponse(),
 				Students = courseStudents.Select(u => new StudentResponse()
 				{
 					Id = u.StudentId,
 					NavigationId = u.Student.NavigationId,
+					ImageUrl = u.Student.ImageUrl,
 					Title = u.Student.Title,
 					Email = u.Student.Email,
 					FirstName = u.Student.FirstName,
-					LastName = u.Student.LastName
+					LastName = u.Student.LastName,
+			
 				}).GroupBy(u => u.Id).Select(u => u.First()).ToList()
 			};
 
-			/*
-			 .Select(e => new CourseResponse()
-				{
-					Id = e.Id,
-					NavigationId = e.NavigationId,
-					About = e.About,
-					CourseTitle = e.CourseTitle,
-					Currency = e.Currency,
-					Price = e.Price,
-					NumberOfBookedStudents = e.Students.Count(),
-					TutorName = user.LastName + " " + user.FirstName,
-					Weeks = JsonSerializer.Deserialize<IEnumerable<Memo>>(e.Memos, options)
-					.ConvertMemosToWeekChapters().Count()
-				}).ToList(),
-
-			 */
-
-
-			return ResponseModel.Send(response);
+			return response;
+				 
 		}
 
 

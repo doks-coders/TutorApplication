@@ -1,4 +1,5 @@
-﻿using TutorApplication.SharedModels.Models;
+﻿using System.Security.Claims;
+using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 
 namespace TutorApplication.ApplicationCore.Services.Interfaces
@@ -7,7 +8,7 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 	{
 		Task<ResponseModel> GetStudent(Guid studentId);
 		Task<ResponseModel> GetStudentExtended(Guid studentId);
-		Task<ResponseModel> JoinCourse(Guid courseId, Guid studentId);
+		Task<ResponseModel> JoinCourse(Guid courseId, Guid studentId, ClaimsPrincipal user);
 		Task<ResponseModel> UpdateStudentProfileInfo(UpdateStudentProfileInformationRequest request, Guid userId);
 
 	}

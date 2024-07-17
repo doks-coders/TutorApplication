@@ -10,4 +10,18 @@ namespace TutorApplication.Infrastructure.Repositories
 		{
 		}
 	}
+	public interface IMissedMessageRespository : IBaseRepository<MissedMessage>
+	{
+
+	}
+
+	public class MissedMessageRespository : BaseRepository<MissedMessage>, IMissedMessageRespository
+	{
+		public MissedMessageRespository(ApplicationDbContext context) : base(context)
+		{
+		}
+	}
+
+
+
 }

@@ -25,6 +25,8 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 
 		Task<List<DisplayMessageContact>> GetContactsForTutorswithHub(Guid tutorId);
 
+		Task<ResponseModel> CheckMessagingAllowed(Guid recieverId, Guid senderId);
+
 	}
 }
 

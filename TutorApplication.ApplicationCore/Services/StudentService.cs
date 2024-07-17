@@ -9,6 +9,9 @@ using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
 using TutorApplication.SharedModels.Responses;
 using TutorApplication.ApplicationCore.Extensions;
+using System.Security.Claims;
+using TutorApplication.SharedModels.Extensions;
+using TutorApplication.ApplicationCore.SignalR.Services;
 
 
 namespace TutorApplication.ApplicationCore.Services
@@ -17,12 +20,16 @@ namespace TutorApplication.ApplicationCore.Services
 	{
 		private readonly IMediator _mediator;
 		private readonly IUnitOfWork _unitOfWork;
-		public StudentService(IMediator mediator, IUnitOfWork unitOfWork)
+		private readonly IMessageHubServices _messageHubServices;
+		private readonly IHubServices _hubServices;
+
+		public StudentService(IMediator mediator, IUnitOfWork unitOfWork, IMessageHubServices messageHubServices, IHubServices hubServices)
 		{
 			_mediator = mediator;
 			_unitOfWork = unitOfWork;
+			_messageHubServices = messageHubServices;
+			_hubServices = hubServices;
 		}
-
 
 		public Task<ResponseModel> GetStudent(Guid studentId)
 		{
@@ -44,10 +51,12 @@ namespace TutorApplication.ApplicationCore.Services
 			{
 				About = user.About,
 				Email = user.Email,
+				Interests = user.Interests,
+				ImageUrl = user.ImageUrl,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				Id = user.Id,
-				Title = user.Title
+				Title = user.Title,
 			};
 			var item = await _unitOfWork.CourseStudents.GetOneCourseStudentForStudent(studentId);
 			
@@ -60,6 +69,7 @@ namespace TutorApplication.ApplicationCore.Services
 				NavigationId = e.Tutor.NavigationId,
 				About = e.Tutor.About,
 				Title = e.Tutor.Title,
+				ImageUrl = e.Tutor.ImageUrl,
 				Email = e.Tutor.Email,
 				FirstName = e.Tutor.FirstName,
 				LastName = e.Tutor.LastName,
@@ -75,7 +85,7 @@ namespace TutorApplication.ApplicationCore.Services
 		}
 
 
-		public async Task<ResponseModel> JoinCourse(Guid courseId, Guid studentId)
+		public async Task<ResponseModel> JoinCourse(Guid courseId, Guid studentId,ClaimsPrincipal user)
 		{
 			var checkCourseStudent = await _unitOfWork.CourseStudents.GetItem(u => u.CourseId == courseId && u.StudentId == studentId);
 			if (checkCourseStudent != null) return ResponseModel.Send("You have joined this course already");
@@ -85,12 +95,34 @@ namespace TutorApplication.ApplicationCore.Services
 			{
 				CourseId = courseId,
 				StudentId = studentId,
-				TutorId = course.TutorId,
+				TutorId =(Guid) course.TutorId,
 			};
+
+			var tutor = await _unitOfWork.Users.GetItem(u => u.Id == course.TutorId);
 			if (await _unitOfWork.CourseStudents.AddItem(courseStudent))
 			{
 				if (await _unitOfWork.SaveChanges())
 				{
+					//Connect To Tutor
+					string tutorRecieverName = await _hubServices.GetReceiver("false", course.TutorId, course.Id);
+					var directGroupName = HubUtils.GetGroupName(user.GetUserEmail(), tutorRecieverName, "false");
+
+					//Direct Meessaging
+					await _messageHubServices.AddUserGroupDirect(directGroupName, user.GetUserEmail(), user.GetUserId(),course.TutorId,course.Id, "false");
+					await _messageHubServices.AddUserGroupDirect(directGroupName, tutor.Email, tutor.Id, user.GetUserId(), course.Id,"false");
+
+
+					//Connect To Group 
+					string groupRecieverName = await _hubServices.GetReceiver("true", course.TutorId, course.Id);
+					var groupName = HubUtils.GetGroupName(user.GetUserEmail(), groupRecieverName, "true");
+					await _messageHubServices.AddUserGroup(groupName, user.GetUserEmail(), user.GetUserId(), course.TutorId, course.Id, "true");
+					await _messageHubServices.AddUserGroup(groupName, tutor.Email, tutor.Id, user.GetUserId(), course.Id, "true");
+
+
+
+
+					//Tutor
+
 					return ResponseModel.Send("Registered Successfully");
 				}
 				throw new CustomException(ErrorCodes.ErrorWhileSaving);

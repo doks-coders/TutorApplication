@@ -31,20 +31,57 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 				Id = res.Id,
 				SenderId = senderId,
 				Content = res.Content,
-				Created = res.Created
+				Created = res.Created,
+				SenderName = res.Sender.LastName + " " + res.Sender.FirstName
 			};
 		}
 
-		public async Task AddUserGroup(string groupName, string userName)
+		public async Task AddUserGroup(string groupName, string userName,Guid userId,Guid recieverId, Guid courseGroupId,string isGroup )
 		{
-			var userGroup = await _unitOfWork.UserGroups.GetItems(u => u.UserName == userName && u.GroupName == groupName);
+			
+			var userGroup = await _unitOfWork.UserGroups.GetItems(u => 
+			u.UserName == userName && 
+			u.UserId == userId &&
+			u.RecieverId == recieverId &&
+			u.CourseGroupId == courseGroupId &&
+			u.GroupName == groupName&&
+			u.isGroup == isGroup);
+
 			if (userGroup.Count() == 0)
 			{
-				await _unitOfWork.UserGroups.AddItem(new UserGroup() { GroupName = groupName, UserName = userName });
+				await _unitOfWork.UserGroups.AddItem(new UserGroup() { 
+					GroupName = groupName, 
+					UserName = userName,
+					UserId=userId ,
+					RecieverId = recieverId,
+					CourseGroupId = courseGroupId,
+					isGroup = isGroup
+				});
 				await _unitOfWork.SaveChanges();
 			}
 		}
+		public async Task AddUserGroupDirect(string groupName, string userName, Guid userId, Guid recieverId, Guid courseGroupId, string isGroup)
+		{
 
+			var userGroup = await _unitOfWork.UserGroups.GetItems(u =>
+			u.UserId == userId &&
+			u.RecieverId == recieverId &&
+			u.isGroup == isGroup);
+
+			if (userGroup.Count() == 0)
+			{
+				await _unitOfWork.UserGroups.AddItem(new UserGroup()
+				{
+					GroupName = groupName,
+					UserName = userName,
+					UserId = userId,
+					RecieverId = recieverId,
+					CourseGroupId = courseGroupId,
+					isGroup = isGroup
+				});
+				await _unitOfWork.SaveChanges();
+			}
+		}
 		public async Task<MessageResponse> SendGroupMessage(MessageRequest request, Guid senderId, string groupName)
 		{
 			var courseGroupMessage = new CourseGroupMessageRequest()
@@ -53,13 +90,14 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 				CourseGroupId = (Guid)request.CourseGroupId
 			};
 			var res = await _messageService.SendCourseGroupMessage(courseGroupMessage, senderId);
-
+			var course = await _unitOfWork.Courses.GetItem(u => u.Id == request.CourseGroupId);
 			return new MessageResponse()
 			{
 				Id = res.Id,
 				SenderId = senderId,
 				Content = res.Content,
-				Created = res.Created
+				Created = res.Created,
+				SenderName = res.Sender.LastName + " "+ res.Sender.FirstName + (course.TutorId == senderId ? " (Tutor)" : "")
 			};
 		}
 
@@ -88,7 +126,10 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 		Task<MessageResponse> SendDirectMessage(MessageRequest request, Guid senderId, string groupName);
 		Task<List<MessageResponse>> GetCourseGroupMessages(Guid courseGroupId, Guid senderId);
 		Task<List<MessageResponse>> GetDirectMessages(Guid recieverId, Guid senderId);
-		Task AddUserGroup(string groupName, string userName);
+		Task AddUserGroup(string groupName, string userName, Guid userId, Guid recieverId, Guid courseGroupId, string isGroup);
+		Task AddUserGroupDirect(string groupName, string userName, Guid userId, Guid recieverId, Guid courseGroupId, string isGroup);
+
+
 	}
 
 

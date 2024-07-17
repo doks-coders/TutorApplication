@@ -1,8 +1,34 @@
-﻿namespace TutorApplication.ApplicationCore.SignalR.Persistence
+﻿using TutorApplication.SharedModels.Models;
+
+namespace TutorApplication.ApplicationCore.SignalR.Persistence
 {
 	public class OnlineUsers
 	{
 		public List<OnlineUser> Users = new List<OnlineUser>();
+
+		public List<SessionInfo> Sessions = new List<SessionInfo>();
+
+		public Task AddSession(SessionInfo session)
+		{
+			lock (session)
+			{
+				var index = Sessions.FindIndex(u => u.UserId == session.UserId);
+
+				if(index >= 0)
+				{
+					Sessions[index] = session;
+				}
+				else
+				{
+					Sessions.Add(session);
+				}
+					
+				
+				
+				
+				return Task.CompletedTask;
+			}
+		}
 
 		public Task AddNewOnlineUser(OnlineUser user)
 		{
@@ -28,6 +54,9 @@
 	public class OnlineUser
 	{
 		public string UserName { get; set; }
+		public Guid UserId { get; set; }
+
+		public string GroupName { get; set; }
 		public string ConnectionId { get; set; }
 	}
 }

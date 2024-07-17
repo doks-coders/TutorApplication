@@ -22,6 +22,7 @@ namespace TutorApplication.Infrastructure.Configurations
 				.WithOne(u => u.Sender)
 				.HasForeignKey(u => u.SenderId)
 				.OnDelete(DeleteBehavior.NoAction);
+
 		}
 	}
 }

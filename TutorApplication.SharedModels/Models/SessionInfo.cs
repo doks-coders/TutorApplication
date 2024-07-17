@@ -8,5 +8,7 @@
 		public string SenderEmail { get; set; }
 		public Guid SenderId { get; set; }
 		public Guid CourseGroupId { get; set; }
+		public string? ConnectionId { get; set; }
+		public Guid? UserId { get; set; }
 	}
 }

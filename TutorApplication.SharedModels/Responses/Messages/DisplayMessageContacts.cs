@@ -12,6 +12,7 @@
 		public string lastTimeAvailable { get; set; }
 		public string SubText { get; set; }
 		public bool IsOnline { get; set; } = false;
+		public int MissedMessagesCount {  get; set; }	
 	}
 }
 

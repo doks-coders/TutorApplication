@@ -24,7 +24,7 @@ namespace TutorApplication.ApplicationCore.Services
 		public string CreateToken(ApplicationUser user)
 		{
 			ClaimsIdentity identity = new ClaimsIdentity(new List<Claim>() {
-
+				
 			new Claim(ClaimTypes.Name,user.Email),
 			new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
 			new Claim(ClaimTypes.Email,user.Email),

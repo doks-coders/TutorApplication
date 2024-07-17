@@ -15,7 +15,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<VideoGroupChats>();
 builder.Services.AddSingleton<OnlineUsers>();
+builder.Services.AddSingleton<MessageUsers>();
 builder.Services.ConfigureAppServices(builder.Configuration);
+
 builder.Services.ConfigureIdentityServices(builder.Configuration);
 
 var connString = "";

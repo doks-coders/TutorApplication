@@ -9,6 +9,8 @@
 		public IConnectionRepository Connections { get; }
 		public IGroupRepository Groups { get; }
 		public IUserGroupRepository UserGroups { get; }
+		public IPhotoRepository Photos { get; }
+		IMissedMessageRespository MissedMessage { get; }
 		Task<bool> SaveChanges();
 	}
 }

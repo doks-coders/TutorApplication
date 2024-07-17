@@ -22,5 +22,15 @@ namespace TutorApplication.Infrastructure.Repositories
 				.ThenInclude(u => u.Tutor)
 				.ToListAsync();
 		}
+
+		public async Task<IEnumerable<CourseStudent>> GetOneCourseStudentForTutor(Guid tutorId)
+		{
+			return await _context.CourseStudents.Where(u => u.TutorId == tutorId)
+				.Include(u => u.Course)
+				.ThenInclude(u => u.Students)
+				.Include(u => u.Course)
+				.ThenInclude(u => u.Tutor)
+				.ToListAsync();
+		}
 	}
 }

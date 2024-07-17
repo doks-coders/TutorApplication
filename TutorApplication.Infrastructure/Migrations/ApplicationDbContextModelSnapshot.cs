@@ -178,6 +178,9 @@ namespace TutorApplication.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("AuthStep")
+                        .HasColumnType("text");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -201,8 +204,17 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<string>("FullNameBackwards")
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Interests")
+                        .HasColumnType("text");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastSeen")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockAccount")
                         .HasColumnType("boolean");
@@ -233,6 +245,9 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("PhotoId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -260,6 +275,8 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("PhotoId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -302,6 +319,9 @@ namespace TutorApplication.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("CourseStep")
+                        .HasColumnType("text");
+
                     b.Property<string>("CourseTitle")
                         .IsRequired()
                         .HasColumnType("text");
@@ -313,6 +333,9 @@ namespace TutorApplication.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<string>("Memos")
                         .IsRequired()
                         .HasColumnType("text");
@@ -320,8 +343,14 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<Guid>("NavigationId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("PhotoId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Price")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Tags")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("TutorId")
                         .HasColumnType("uuid");
@@ -329,7 +358,13 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<DateTime>("Updated")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool?>("isDetailsCompleted")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PhotoId")
+                        .IsUnique();
 
                     b.HasIndex("TutorId");
 
@@ -420,6 +455,73 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.MissedMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CourseGroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("NavigationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RecieverId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("isGroup")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MissedMessages");
+                });
+
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.Photo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("NavigationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Photos");
+                });
+
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.UserGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -428,12 +530,27 @@ namespace TutorApplication.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid?>("CourseGroupId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("LastSeen")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("RecieverId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("UserName")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("isGroup")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -508,6 +625,16 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("TutorApplication.SharedModels.Entities.Photo", "Photo")
+                        .WithMany()
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Photo");
+                });
+
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Connection", b =>
                 {
                     b.HasOne("TutorApplication.SharedModels.Entities.Group", "Group")
@@ -521,11 +648,18 @@ namespace TutorApplication.Infrastructure.Migrations
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Course", b =>
                 {
+                    b.HasOne("TutorApplication.SharedModels.Entities.Photo", "Photo")
+                        .WithOne("Course")
+                        .HasForeignKey("TutorApplication.SharedModels.Entities.Course", "PhotoId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("TutorApplication.SharedModels.Entities.ApplicationUser", "Tutor")
                         .WithMany("Courses")
                         .HasForeignKey("TutorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Photo");
 
                     b.Navigation("Tutor");
                 });
@@ -598,6 +732,12 @@ namespace TutorApplication.Infrastructure.Migrations
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Group", b =>
                 {
                     b.Navigation("Connections");
+                });
+
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.Photo", b =>
+                {
+                    b.Navigation("Course")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

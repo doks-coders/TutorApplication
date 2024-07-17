@@ -4,6 +4,8 @@
 	{
 		public Guid Id { get; set; }
 		public string Content { get; set; }
+		public string SenderName { get; set; }
+		public string Mode { get; set; } = "chat";
 		public DateTime Created { get; set; }
 		public Guid SenderId { get; set; }
 	}
