@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TutorApplication.ApplicationCore.Services.Interfaces;
+using TutorApplication.SharedModels.Extensions;
 
 namespace TutorApplication.Controllers
 {
@@ -18,6 +20,13 @@ namespace TutorApplication.Controllers
 		[HttpGet("get-tutor-contacts/{tutorId}")]
 		public async Task<ActionResult> GetContactsForTutors(Guid tutorId)
 		=> await _messageService.GetContactsForTutors(tutorId);
+
+		[Authorize]
+		[HttpGet("check-message-allowed/{tutorId}")]
+		public async Task<ActionResult> CheckMessagingAllowed(Guid tutorId)
+		=> await _messageService.CheckMessagingAllowed(tutorId,User.GetUserId());
+
+		
 
 		[HttpPost("delete-message")]
 		public async Task<ActionResult> DeleteMessage()

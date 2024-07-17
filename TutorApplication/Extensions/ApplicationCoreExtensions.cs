@@ -1,4 +1,6 @@
-﻿using TutorApplication.ApplicationCore.Services;
+﻿using BiiGBackend.ApplicationCore.Services;
+using BiiGBackend.Models.SharedModels;
+using TutorApplication.ApplicationCore.Services;
 using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.ApplicationCore.SignalR.Services;
 using TutorApplication.Infrastructure.Data;
@@ -15,7 +17,7 @@ namespace TutorApplication.Extensions
 			services.AddMediatR(cfg =>
 			cfg.RegisterServicesFromAssembly(typeof(ApplicationDbContext).Assembly));
 
-
+			services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
 
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
 			services.AddScoped<ITokenService, TokenService>();
@@ -26,6 +28,7 @@ namespace TutorApplication.Extensions
 			services.AddScoped<IMessageService, MessageService>();
 			services.AddScoped<IMessageHubServices, MessageHubServices>();
 			services.AddScoped<IHubServices, HubServices>();
+			services.AddScoped<IPhotoService, PhotoService>();
 			return services;
 		}
 	}

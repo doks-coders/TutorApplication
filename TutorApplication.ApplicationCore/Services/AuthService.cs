@@ -163,6 +163,24 @@ namespace TutorApplication.ApplicationCore.Services
 			return ResponseModel.Send(apiResponse);
 		}
 
+
+		public async Task<ResponseModel> GetUpdatedState(ClaimsPrincipal user)
+		{
+			bool isUpdated = false;
+			try
+			{
+				var id = user.GetUserId();
+				var retrievedUser = await _unitOfWork.Users.GetItem(u => u.Id == id);
+				if (retrievedUser != null)
+				{
+					isUpdated = retrievedUser.isProfileUpdated;
+				}
+			}catch(Exception ex){}
+
+
+			return ResponseModel.Send(isUpdated); 
+		}
+
 		public async Task<ResponseModel> Register(RegisterUserRequest request)
 		{
 			var validator = new RegisterUserValidators();

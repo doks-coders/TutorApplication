@@ -17,5 +17,6 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 		Task<ResponseModel> UpdateFullName(ClaimsPrincipal user, FullNameRequest request);
 		Task<ResponseModel> UpdateInterests(ClaimsPrincipal user, InterestsRequest request);
 		Task<ResponseModel> UpdateTitle(ClaimsPrincipal user, TitleRequest request);
+		Task<ResponseModel> GetUpdatedState(ClaimsPrincipal user);
 	}
 }
