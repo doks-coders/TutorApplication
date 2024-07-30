@@ -26,11 +26,15 @@ namespace TutorApplication.ApplicationCore.Services
 		private Expression<Func<ApplicationUser, bool>> Search(PaginationRequest request)
 		{
 			return u =>
-			   (string.IsNullOrEmpty(request.TutorName) || request.TutorName == "All" || u.FullName.ToLower().Contains(request.TutorName.ToLower()) || u.FullNameBackwards.ToLower().Contains(request.TutorName.ToLower()))
+			   (request.TutorName == "All" || u.FullName.ToLower().Contains(request.TutorName.ToLower()) || u.FullNameBackwards.ToLower().Contains(request.TutorName.ToLower()))
 			   &&
-			   (u.AccountType == RoleConstants.Tutor)
-				&&
-			   (u.isProfileUpdated == true);
+			   u.AccountType == RoleConstants.Tutor
+				&& u.isProfileUpdated == true;
+
+
+
+			//(u.CourseTitle.ToLower().Contains(request.CourseKeyWord.ToLower()) || pagination.CourseKeyWord == "All") && u.isDetailsCompleted == true;
+
 
 		}
 

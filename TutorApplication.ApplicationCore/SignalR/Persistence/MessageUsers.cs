@@ -8,7 +8,17 @@
 		{
 			lock (Users)
 			{
-				Users.Add(user);
+				var index = Users.FindIndex(u=>u.UserId == user.UserId);
+				if(index >= 0)
+				{
+					Users[index] = user;
+				}
+				else
+				{
+					Users.Add(user);
+				}
+				
+			
 				return Task.CompletedTask;
 			}
 		}
@@ -17,8 +27,8 @@
 		{
 			lock (Users)
 			{
-				var user = Users.Where(u => u.UserName == userName).FirstOrDefault();
-				Users.Remove(user);
+				var user = Users.RemoveAll(u => u.UserName == userName);
+				
 				return Task.CompletedTask;
 			}
 		}

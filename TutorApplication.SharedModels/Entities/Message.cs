@@ -26,5 +26,8 @@ namespace TutorApplication.SharedModels.Entities
 
 		public bool isDeleted { get; set; } = false;
 
+		public List<Photo>? Photos { get; set; }
+
+
 	}
 }

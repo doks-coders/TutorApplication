@@ -14,6 +14,7 @@ namespace TutorApplication.SharedModels.Entities
 		public string? Title { get; set; }
 		public string? Interests { get; set; }
 		public string? About { get; set; }
+		public string? UserIds { get; set; }
 
 		public DateTime DateUpdated { get; set; }
 		public DateTime? LastSeen { get; set; }

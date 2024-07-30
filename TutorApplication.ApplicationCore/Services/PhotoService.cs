@@ -37,9 +37,9 @@ namespace BiiGBackend.ApplicationCore.Services
 					ImageUploadParams uploadParams = new ImageUploadParams()
 					{
 						File = new FileDescription(file.Name, stream),
-						Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
 						Folder = "tutor-photo-backend"
 					};
+					// new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
 
 					uploadResult = await cloudinary.UploadAsync(uploadParams);
 				};
@@ -77,6 +77,23 @@ namespace BiiGBackend.ApplicationCore.Services
 
 		}
 
+		public async Task<ResponseModel> UploadImage(IFormFile file)
+		{
+			ImageUploadResult res = await AddPhotoAsync(file);
+
+			if (res.Error != null) throw new CustomException(res.Error.Message);
+			Photo photo = new Photo()
+			{
+				Url = res.SecureUrl.AbsoluteUri,
+				PublicId = res.PublicId,
+			};
+
+			await _unitOfWork.Photos.AddItem(photo);
+			await _unitOfWork.SaveChanges();
+
+			return ResponseModel.Send(new PhotoResponse() { Id = photo.Id, PublicId = photo.PublicId, Url = photo.Url });
+
+		}
 
 		public async Task<ResponseModel> UpdateCourseImage(IFormFile file, Guid courseId)
 		{

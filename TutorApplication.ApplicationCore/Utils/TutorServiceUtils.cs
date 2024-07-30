@@ -43,7 +43,7 @@ namespace TutorApplication.ApplicationCore.Utils
 			return Weeks;
 		}
 
-		private static DateTime ConvertDateStringToDate(string? dateString = "1/12/2024")
+		public static DateTime ConvertDateStringToDate(string? dateString = "1/12/2024")
 		{
 			string format = "d/M/yyyy";
 			CultureInfo provider = CultureInfo.InvariantCulture;

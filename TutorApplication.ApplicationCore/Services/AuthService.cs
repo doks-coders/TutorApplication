@@ -78,6 +78,8 @@ namespace TutorApplication.ApplicationCore.Services
 			var retrievedUser = await _unitOfWork.Users.GetItem(u => u.Id == id);
 			retrievedUser.FirstName = request.FirstName;
 			retrievedUser.LastName = request.LastName;
+			retrievedUser.FullName = request.FirstName+" "+request.LastName;
+			retrievedUser.FullNameBackwards = request.LastName + " " + request.FirstName;
 			retrievedUser.AuthStep = ProfileSetup.ProfileImage;
 			await _unitOfWork.SaveChanges();
 			return ResponseModel.Send(ProfileSetup.ProfileImage);

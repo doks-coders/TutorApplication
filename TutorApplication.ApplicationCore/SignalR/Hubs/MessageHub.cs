@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR;
 using TutorApplication.ApplicationCore.SignalR.Persistence;
 using TutorApplication.ApplicationCore.SignalR.Services;
@@ -46,31 +47,34 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			//await ConnectToGroup();
 		}
 
-		public async Task ChangeGroup(SessionInfo sessionInfo)
-		{
-			GroupState = sessionInfo;
-			//await ConnectToGroup(usingContextHttp: false);
 
-		}
 
 		public async Task ConnectToGroup(SessionInfo session)
 		{
 			try
 			{
-				session.ConnectionId = Context.ConnectionId;
-				session.UserId = Context.User.GetUserId();
-				await _onlineUsers.AddSession(session);
+			
 				string recieverName = await _hubServices.GetReceiver(session.IsGroup, session.RecieverId, session.CourseGroupId);
 				var groupName = HubUtils.GetGroupName(session.SenderEmail, recieverName, session.IsGroup);
+
+				session.ConnectionId = Context.ConnectionId;
+				session.UserId = Context.User.GetUserId();
+				session.GroupName = groupName;
+
+				await _onlineUsers.AddSession(session);
+				
 				await _hubServices.AddConnectionToGroup(groupName, Context.ConnectionId, Context.User.GetUserEmail());
 				await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 				var onlineUser = new OnlineUser
 				{
 					GroupName = groupName,
 					ConnectionId = Context.ConnectionId,
-					UserName = Context.User.GetUserEmail()
+					UserName = Context.User.GetUserEmail(),
+					UserId = Context.User.GetUserId()
 				};
 				await _messageUsers.AddNewOnlineUser(onlineUser);
+
+				
 
 				//Enables the messaging to take place
 				if (session.IsGroup == "false")
@@ -115,7 +119,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 		}
 
 
-		public async Task SendMessage(MessageRequest request, SessionInfo session)
+		public async Task SendMessage(MessageRequest request)
 		{
 			var senderEmail = Context.User.GetUserEmail();
 			var senderId = Context.User.GetUserId();
@@ -123,40 +127,39 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 			string recieverName = await _hubServices.GetReceiver(isGroup, (Guid)request.RecieverId, (Guid)request.CourseGroupId);
 
+			var session = _onlineUsers.Sessions.Where(u => u.ConnectionId == Context.ConnectionId).FirstOrDefault();
+
+			if(session != null)
+			{
+				var courseGroupId = session.CourseGroupId;
+
+				MessageResponse response;
+				if (request.isGroup)
+				{
+					response = await _messageHubServices.SendGroupMessage(request, senderId, session.GroupName);
+				}
+				else
+				{
+					response = await _messageHubServices.SendDirectMessage(request, senderId, session.GroupName);
+				}
+
+				await Clients.Group(session.GroupName).SendAsync("NewMessage", response);
+
+				await SendMessageAlert(session.GroupName, senderId, courseGroupId, isGroup);
+			}
 			
-			var courseGroupId = session.CourseGroupId;
-		
-			//await _db.MissedMessages.AddAsync(message);
-			//await _db.SaveChangesAsync();
-			var groupName = HubUtils.GetGroupName(senderEmail, recieverName, isGroup);
-
-			MessageResponse response;
-			if (request.isGroup)
-			{
-				response = await _messageHubServices.SendGroupMessage(request, senderId, groupName);
-			}
-			else
-			{
-				response = await _messageHubServices.SendDirectMessage(request, senderId, groupName);
-			}
-
-			await Clients.Group(groupName).SendAsync("NewMessage", response);
-
-			await SendMessageAlert(groupName, senderId,courseGroupId, isGroup);
 		}
 
-		public async Task MessageTyping(bool isTyping,SessionInfo session)
+		public async Task MessageTyping(bool isTyping)
 		{
-			if (session == null) throw new HubException();
-			string recieverName = await _hubServices.GetReceiver(session.IsGroup, session.RecieverId, session.CourseGroupId);
-			var groupName = HubUtils.GetGroupName(session.SenderEmail, recieverName, session.IsGroup);
-
-			var connections = await _unitOfWork.Connections.GetItems(u => u.GroupName == groupName);
-
-			var messageConnections = await _unitOfWork.Connections.GetItems(u => u.GroupName == groupName && u.Username != Context.User.GetUserEmail());
-			var messageConnectionsIds = messageConnections.Select(u => u.ConnectionURL).ToList();
-
-			await Clients.Clients(messageConnectionsIds).SendAsync("IsTyping", isTyping);
+			
+			var session = _onlineUsers.Sessions.Where(u => u.ConnectionId == Context.ConnectionId).FirstOrDefault();
+			if (session != null)
+			{
+				await Clients.Group(session.GroupName).SendAsync("IsTyping", isTyping,session.UserId);
+			}
+		
+			
 		}
 
 
@@ -175,8 +178,6 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 
 
 			//Used For Missed Messages
-			var m = await _unitOfWork.UserGroups.GetItems(u => u.GroupName == groupName );
-			var mlist = m.ToList();
 			var missedCallGroups = await _unitOfWork.UserGroups.GetItems(u => u.GroupName == groupName && u.UserName != Context.User.GetUserEmail() && !activeUsers.Contains(u.UserName));
 			var connectionUserIds = missedCallGroups.Select(u => u.UserId).ToList();
 			var missedMessages =  connectionUserIds.Select(u => new MissedMessage()
@@ -218,25 +219,24 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 		}
 		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
-			//await DisconnetGroup();
+	
 			var session = _onlineUsers.Sessions.Where(u => u.ConnectionId == Context.ConnectionId).FirstOrDefault();
 			if(session != null)
 			{
-				await DisconnectFromGroup(session);
+				await DisconnectFromGroup(true);
+				_onlineUsers.Sessions.Remove(session);
 			}
+			
 			
 		}
 
 
-		public async Task DisconnectGroup(SessionInfo session)
+		
+
+		public async Task UpdateUser(SessionInfo session, bool updateLastSeenChat)
 		{
-			GroupState = session;
-			//await DisconnectGroup(false);
-		}
-		public async Task DisconnectFromGroup(SessionInfo session)
-		{
-			//var session = GetSessionInfo(usingContextHttp);
 			var initialUserGroup = new UserGroup();
+
 			if (session.IsGroup == "false")
 			{
 				initialUserGroup = await _unitOfWork.UserGroups.GetItem(u => u.isGroup == session.IsGroup && u.UserId == session.SenderId && u.RecieverId == session.RecieverId);
@@ -252,26 +252,36 @@ namespace TutorApplication.ApplicationCore.SignalR.Hubs
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == session.SenderId);
 			user.LastSeen = DateTime.UtcNow;
 			await _unitOfWork.SaveChanges();
-			await _messageUsers.RemoveNewOnlineUser(Context.User.GetUserEmail());
 
-
-
-			if (initialUserGroup != null)
+			if (updateLastSeenChat)
 			{
-				initialUserGroup.LastSeen = DateTime.UtcNow;
+				if (initialUserGroup != null)
+				{
+					initialUserGroup.LastSeen = DateTime.UtcNow;
+				}
+
+				await _unitOfWork.SaveChanges();
 			}
+		}
+		public async Task DisconnectFromGroup(bool? isMessageDisconnect=false)
+		{
+			var session = _onlineUsers.Sessions.Where(u => u.ConnectionId == Context.ConnectionId).FirstOrDefault();
 
-			var amount = await _unitOfWork.SaveChanges();
+			if (session != null)
+			{
+				await MessageTyping(false);
 
-			await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
 
+				await _messageUsers.RemoveNewOnlineUser(Context.User.GetUserEmail());
+
+
+				await UpdateUser(session, !(bool)isMessageDisconnect);
+
+
+				await Groups.RemoveFromGroupAsync(Context.ConnectionId, session.GroupName);
+			}
 			
 			await _hubServices.RemoveConnection(Context.User.GetUserEmail());
-			if (session!=null)
-			{
-				await MessageTyping(false, session);
-			}
-			
 			
 		}
 

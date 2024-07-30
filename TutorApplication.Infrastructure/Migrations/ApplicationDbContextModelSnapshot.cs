@@ -257,6 +257,9 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("UserIds")
+                        .HasColumnType("text");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -503,6 +506,9 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("MessageId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("NavigationId")
                         .HasColumnType("uuid");
 
@@ -519,7 +525,42 @@ namespace TutorApplication.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MessageId");
+
                     b.ToTable("Photos");
+                });
+
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.Quiz", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("NavigationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("QuizName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("QuizQuestions")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Quizs");
                 });
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.UserGroup", b =>
@@ -708,6 +749,26 @@ namespace TutorApplication.Infrastructure.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.Photo", b =>
+                {
+                    b.HasOne("TutorApplication.SharedModels.Entities.Message", "Message")
+                        .WithMany("Photos")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Message");
+                });
+
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.Quiz", b =>
+                {
+                    b.HasOne("TutorApplication.SharedModels.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.ApplicationRole", b =>
                 {
                     b.Navigation("UserRoles");
@@ -732,6 +793,11 @@ namespace TutorApplication.Infrastructure.Migrations
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Group", b =>
                 {
                     b.Navigation("Connections");
+                });
+
+            modelBuilder.Entity("TutorApplication.SharedModels.Entities.Message", b =>
+                {
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("TutorApplication.SharedModels.Entities.Photo", b =>

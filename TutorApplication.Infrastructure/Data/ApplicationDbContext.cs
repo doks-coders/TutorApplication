@@ -22,6 +22,7 @@ namespace TutorApplication.Infrastructure.Data
 		public DbSet<UserGroup> UserGroups { get; set; }
 		public DbSet<Photo> Photos { get; set; }
 		public DbSet<MissedMessage> MissedMessages { get; set; }
+		public DbSet<Quiz> Quizs { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

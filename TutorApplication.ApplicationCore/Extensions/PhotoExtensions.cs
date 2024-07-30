@@ -20,5 +20,16 @@ namespace TutorApplication.ApplicationCore.Extensions
 				Url = photo.Url
 			};
 		}
+
+		public static List<PhotoResponse> ConvertPhotoToPhotoResponse(this List<Photo> photos)
+		{
+			return photos.Select(u => new PhotoResponse()
+			{
+				CourseId = u.CourseId,
+				Id = u.Id,
+				PublicId = u.PublicId,
+				Url = u.Url
+			}).ToList();
+		}
 	}
 }

@@ -11,6 +11,7 @@
 		public IUserGroupRepository UserGroups { get; }
 		public IPhotoRepository Photos { get; }
 		IMissedMessageRespository MissedMessage { get; }
+		public IQuizRepository Quizs { get; }
 		Task<bool> SaveChanges();
 	}
 }

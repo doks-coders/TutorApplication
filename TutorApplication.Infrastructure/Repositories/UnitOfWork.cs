@@ -5,8 +5,8 @@ namespace TutorApplication.Infrastructure.Repositories
 {
 	public class UnitOfWork : IUnitOfWork
 	{
-		public IMissedMessageRespository MissedMessage  { get; }
-	public IApplicationUserRepository Users { get; }
+		public IMissedMessageRespository MissedMessage { get; }
+		public IApplicationUserRepository Users { get; }
 		public ICourseRepository Courses { get; }
 		public ICourseStudentRepository CourseStudents { get; }
 		public IMessageRepository Messages { get; }
@@ -14,6 +14,7 @@ namespace TutorApplication.Infrastructure.Repositories
 		public IGroupRepository Groups { get; }
 		public IUserGroupRepository UserGroups { get; }
 		public IPhotoRepository Photos { get; }
+		public IQuizRepository Quizs { get; }
 		private readonly ApplicationDbContext _context;
 
 		public UnitOfWork(ApplicationDbContext context)
@@ -29,6 +30,7 @@ namespace TutorApplication.Infrastructure.Repositories
 			UserGroups = new UserGroupRepository(context);
 			Photos = new PhotoRespository(context);
 			MissedMessage = new MissedMessageRespository(context);
+			Quizs = new QuizRepository(context);
 		}
 
 		public async Task<bool> SaveChanges()

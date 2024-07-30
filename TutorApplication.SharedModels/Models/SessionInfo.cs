@@ -10,5 +10,6 @@
 		public Guid CourseGroupId { get; set; }
 		public string? ConnectionId { get; set; }
 		public Guid? UserId { get; set; }
+		public string? GroupName { get; set; }
 	}
 }

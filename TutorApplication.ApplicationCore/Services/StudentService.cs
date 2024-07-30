@@ -12,6 +12,7 @@ using TutorApplication.ApplicationCore.Extensions;
 using System.Security.Claims;
 using TutorApplication.SharedModels.Extensions;
 using TutorApplication.ApplicationCore.SignalR.Services;
+using System.Linq;
 
 
 namespace TutorApplication.ApplicationCore.Services
@@ -99,6 +100,13 @@ namespace TutorApplication.ApplicationCore.Services
 			};
 
 			var tutor = await _unitOfWork.Users.GetItem(u => u.Id == course.TutorId);
+			var student = await _unitOfWork.Users.GetItem(u => u.Id == studentId);
+
+			await AddConnectionToUser(tutor, studentId);
+			await AddConnectionToUser(student, course.TutorId);
+
+			await _unitOfWork.SaveChanges();
+
 			if (await _unitOfWork.CourseStudents.AddItem(courseStudent))
 			{
 				if (await _unitOfWork.SaveChanges())
@@ -120,7 +128,6 @@ namespace TutorApplication.ApplicationCore.Services
 
 
 
-
 					//Tutor
 
 					return ResponseModel.Send("Registered Successfully");
@@ -128,6 +135,18 @@ namespace TutorApplication.ApplicationCore.Services
 				throw new CustomException(ErrorCodes.ErrorWhileSaving);
 			}
 			throw new CustomException(ErrorCodes.ErrorWhileAdding);
+		}
+
+		public async Task AddConnectionToUser(ApplicationUser user,Guid userId)
+		{
+			var ids = user.UserIds;
+			var userIds = ids!=null?  ids.Split(",", StringSplitOptions.RemoveEmptyEntries).ToArray().ToList(): new List<string>();
+			if (!userIds.Contains(userId.ToString()))
+			{
+				userIds.Add(userId.ToString());
+			}
+			var updatedstudentIds =  string.Join(",", userIds.ToArray()); 
+			user.UserIds = updatedstudentIds;
 		}
 
 		public async Task<ResponseModel> UpdateStudentProfileInfo(UpdateStudentProfileInformationRequest request, Guid userId)

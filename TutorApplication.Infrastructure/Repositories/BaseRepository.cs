@@ -10,7 +10,7 @@ namespace TutorApplication.Infrastructure.Repositories
 {
 	public class BaseRepository<T> : IBaseRepository<T> where T : class
 	{
-		private readonly DbSet<T> _dbSet;
+		internal readonly DbSet<T> _dbSet;
 
 		public BaseRepository(ApplicationDbContext context)
 		{
@@ -48,6 +48,7 @@ namespace TutorApplication.Infrastructure.Repositories
 				var totalPages = Math.Ceiling(totalNumber / (decimal)limit);
 				var q = _dbSet.AsQueryable();
 				q = IncludeProperties(q, includeProperties);
+
 				var pagedValues = q.Where(query).Skip(skipValue).Take(limit).ToList();
 
 				return new PaginationResponse()
@@ -94,7 +95,7 @@ namespace TutorApplication.Infrastructure.Repositories
 
 
 
-		private IQueryable<T> IncludeProperties(IQueryable<T> dbSetQueryable, string includeProperties)
+		internal IQueryable<T> IncludeProperties(IQueryable<T> dbSetQueryable, string includeProperties)
 		{
 			if (includeProperties != null)
 			{

@@ -15,6 +15,7 @@ namespace TutorApplication.ApplicationCore.Services.Interfaces
 		Task<DeletionResult> DeletePhotoAsync(string publicId);
 		Task<ImageUploadResult> AddPhotoAsync(IFormFile file);
 		Task<ResponseModel> UpdateCourseImage(IFormFile file, Guid courseId);
+		Task<ResponseModel> UploadImage(IFormFile file);
 		Task<ResponseModel> UpdateUserImage(IFormFile file, Guid userId);
 		Task<ResponseModel> DeleteImage(Guid Id);
 	}

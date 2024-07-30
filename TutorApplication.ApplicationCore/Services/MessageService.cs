@@ -1,9 +1,14 @@
-﻿using System.Drawing.Printing;
+﻿using Azure.Core;
+using System.Drawing.Printing;
+using System.Text.Json;
+using TutorApplication.ApplicationCore.Extensions;
 using TutorApplication.ApplicationCore.Services.Interfaces;
+using TutorApplication.ApplicationCore.Utils;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Models;
 using TutorApplication.SharedModels.Requests;
+using TutorApplication.SharedModels.Responses;
 using TutorApplication.SharedModels.Responses.Messages;
 
 namespace TutorApplication.ApplicationCore.Services
@@ -36,7 +41,13 @@ namespace TutorApplication.ApplicationCore.Services
 			var messages = await _unitOfWork.Messages.GetItems(
 				u => u.isCourseGroup == true
 				&&
-				u.CourseId == courseGroupId,includeProperties:"Sender");
+				u.CourseId == courseGroupId, includeProperties: "Sender,Photos");
+
+			JsonSerializerOptions options = new()
+			{
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			};
+			var memos = JsonSerializer.Deserialize<IEnumerable<Memo>>(course.Memos, options);
 
 			var responseMessages = messages.OrderBy(m => m.Created).Select(u => new MessageResponse()
 			{
@@ -44,7 +55,8 @@ namespace TutorApplication.ApplicationCore.Services
 				Content = u.Content,
 				Created = u.Created,
 				Id = u.Id,
-				SenderName = u.Sender.LastName+" "+ u.Sender.FirstName +(u.SenderId==course.TutorId?" (Tutor)":"")
+				Photos = u.Photos.ConvertPhotoToPhotoResponse(),
+				SenderName = u.Sender.LastName + " " + u.Sender.FirstName + (u.SenderId == course.TutorId ? " (Tutor)" : "")
 			}).ToList();
 
 			var userGroup = await _unitOfWork.UserGroups.GetItem(u => u.UserId == senderId && u.CourseGroupId == courseGroupId && u.isGroup == "true");
@@ -63,7 +75,51 @@ namespace TutorApplication.ApplicationCore.Services
 				});
 			}
 
-			return responseMessages;
+			//Adding Memo Topics
+			var finalResponse = new List<MessageResponse>();
+			var bookInfos = memos.Select(u => u.BookInfo).ToList();
+
+
+			var bookDates = memos.Select(u =>
+			{
+				var memoDate = TutorServiceUtils.ConvertDateStringToDate(u.Date);
+				string[] time = u.Time.Split(":");
+				var hour = int.Parse(time[0]);
+				var minute = int.Parse(time[1]);
+				var updatedDate = memoDate.AddHours(hour).AddMinutes(minute);
+				return updatedDate;
+			}).ToList();
+
+			responseMessages.ForEach(el =>
+			{
+				var infoIndex = bookDates.FindIndex(u => u < el.Created);
+
+				if (infoIndex > -1)
+				{
+					finalResponse.Add(
+						new MessageResponse()
+						{
+							SenderId = default,
+							Content = $"Topic - {bookInfos[infoIndex]}",
+							Created = default,
+							Mode = "alert",
+							Id = default,
+							SenderName = default
+						}
+					);
+					bookDates.RemoveAt(infoIndex);
+					bookInfos.RemoveAt(infoIndex);
+				}
+				
+				finalResponse.Add(el);
+				
+			
+			});
+
+
+
+
+			return finalResponse;
 		}
 
 		public async Task<ResponseModel> CheckMessagingAllowed(Guid recieverId, Guid senderId)
@@ -84,10 +140,10 @@ namespace TutorApplication.ApplicationCore.Services
 			u.RecieverId == senderId
 			&&
 			u.SenderId == recieverId
-			,includeProperties: "Sender");
+			, includeProperties: "Sender,Photos");
 
-		
-			
+
+
 
 			var responseMessages = messages.OrderBy(m => m.Created).Select(u => new MessageResponse()
 			{
@@ -95,7 +151,8 @@ namespace TutorApplication.ApplicationCore.Services
 				Content = u.Content,
 				Created = u.Created,
 				Id = u.Id,
-				SenderName = u.Sender.LastName + " " + u.Sender.FirstName
+				SenderName = u.Sender.LastName + " " + u.Sender.FirstName,
+				Photos = u.Photos.ConvertPhotoToPhotoResponse()
 			}).ToList();
 
 			var userGroups = await _unitOfWork.UserGroups.GetItems(u => u.UserId == senderId && u.RecieverId == recieverId && u.isGroup == "false");
@@ -115,7 +172,7 @@ namespace TutorApplication.ApplicationCore.Services
 					SenderName = default
 				});
 			}
-		
+
 
 
 			return responseMessages;
@@ -133,7 +190,13 @@ namespace TutorApplication.ApplicationCore.Services
 			await _unitOfWork.Messages.AddItem(message);
 			await _unitOfWork.SaveChanges();
 
-			var user =  await _unitOfWork.Users.GetItem(u => u.Id == message.SenderId);
+			if (request.Photos != null)
+			{
+				await UpdateMessagePhotos(request.Photos, message.Id);
+
+			}
+
+			var user = await _unitOfWork.Users.GetItem(u => u.Id == message.SenderId);
 			message.Sender = user;
 			return message;
 		}
@@ -144,16 +207,34 @@ namespace TutorApplication.ApplicationCore.Services
 			{
 				SenderId = senderId,
 				RecieverId = request.RecieverId,
-				Content = request.Content
+				Content = request.Content,
 			};
 
 			await _unitOfWork.Messages.AddItem(message);
 			await _unitOfWork.SaveChanges();
+
+			if (request.Photos != null)
+			{
+				await UpdateMessagePhotos(request.Photos, message.Id);
+			}
+
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == message.SenderId);
 			message.Sender = user;
 			return message;
 		}
 
+		private async Task UpdateMessagePhotos(IEnumerable<PhotoResponse> IncomingPhotos, Guid messageId)
+		{
+			var photosIds = IncomingPhotos.Select(e => e.Id.ToString());
+			string photosIdsString = string.Join(",", photosIds.ToArray());
+			var photos = await _unitOfWork.Photos.GetItems(u => photosIdsString.Contains(u.Id.ToString()));
+			photos.ToList().ForEach(val =>
+			{
+				val.MessageId = messageId;
+			});
+
+			await _unitOfWork.SaveChanges();
+		}
 		public async Task<ResponseModel> GetContactsForStudents(Guid studentId)
 		{
 			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.StudentId == studentId, includeProperties: "Tutor,Course");
@@ -192,7 +273,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<ResponseModel> GetContactsForTutors(Guid tutorId)
 		{
-			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId, includeProperties: "Student,Course");
+			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId && u.Course.isDetailsCompleted == true, includeProperties: "Student,Course");
 
 			var registeredCoursesStudents = courseStuds.GroupBy(u => u.StudentId).Select(e => e.First()).Select(u => new DisplayMessageContact()
 			{
@@ -230,12 +311,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<List<DisplayMessageContact>> GetContactsForStudentsWithHub(Guid studentId)
 		{
-			//var user = await _unitOfWork.Users.GetItem(u => u.Id == studentId, includeProperties: "IncomingMessages");
 
-			//var courseMissedMessage = await _unitOfWork.Messages.GetItems(u => u.Created > user.LastSeen);
-			//var missedMessages = user.IncomingMessages.Where(u => u.Created > user.LastSeen);
-
-			
 			var missedGroups = await _unitOfWork.MissedMessage.GetItems(u => u.RecieverId == studentId && u.isGroup == "true");
 			var missedGroupsList = missedGroups.ToList();
 
@@ -255,9 +331,9 @@ namespace TutorApplication.ApplicationCore.Services
 				{
 					DisplayName = u.Tutor.FirstName + " " + u.Tutor.LastName,
 					Email = u.Tutor.Email,
-					SubText = u.Tutor.AccountType != "Student" ? "Tutor" : "Student",
+					SubText = u.Tutor.AccountType, //!= "Student" ? "Tutor" : "Student",
 					RecieverId = u.TutorId,
-					MissedMessagesCount= sub.Count(),
+					MissedMessagesCount = sub.Count(),
 					CourseGroupId = u.CourseId,
 					IsGroup = false,
 					Id = u.Tutor.NavigationId,
@@ -283,7 +359,7 @@ namespace TutorApplication.ApplicationCore.Services
 					IsOnline = false,
 					ImageUrl = u.Course.ImageUrl,
 					lastTimeAvailable = "",
-					MissedMessagesCount= sub.Count()
+					MissedMessagesCount = sub.Count()
 
 				};
 			});
@@ -292,7 +368,7 @@ namespace TutorApplication.ApplicationCore.Services
 		}
 
 
-		public List<MissedMessage> MissedMessages = new ();
+		public List<MissedMessage> MissedMessages = new();
 
 		public async Task<List<DisplayMessageContact>> GetContactsForTutorswithHub(Guid tutorId)
 		{
@@ -300,30 +376,30 @@ namespace TutorApplication.ApplicationCore.Services
 
 			//var courseMissedMessage = await _unitOfWork.Messages.GetItems(u => u.Created > user.LastSeen);
 
-			var missedGroups =  await _unitOfWork.MissedMessage.GetItems(u => u.RecieverId == tutorId&&u.isGroup=="true" );
+			var missedGroups = await _unitOfWork.MissedMessage.GetItems(u => u.RecieverId == tutorId && u.isGroup == "true");
 			var missedGroupsList = missedGroups.ToList();
 
 
-			var missedUsers= await _unitOfWork.MissedMessage.GetItems(u => u.RecieverId == tutorId && u.isGroup == "false");
+			var missedUsers = await _unitOfWork.MissedMessage.GetItems(u => u.RecieverId == tutorId && u.isGroup == "false");
 			var missedUsersList = missedUsers.ToList();
 
 
 			//var missedMessages = user.IncomingMessages.Where(u => u.Created > user.LastSeen).ToList();
 
-			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId , includeProperties: "Student,Course");
+			var courseStuds = await _unitOfWork.CourseStudents.GetItems(u => u.TutorId == tutorId && u.Course.isDetailsCompleted == true, includeProperties: "Student,Course");
 
-			
-			var registeredCoursesStudents = courseStuds.Where(u=>u.StudentId != tutorId).GroupBy(u => u.StudentId).Select(e => e.First()).Select(u =>
+
+			var registeredCoursesStudents = courseStuds.Where(u => u.StudentId != tutorId).GroupBy(u => u.StudentId).Select(e => e.First()).Select(u =>
 			{
-				var sub = missedUsersList.Where(message =>  message.SenderId == u.StudentId).ToList();
+				var sub = missedUsersList.Where(message => message.SenderId == u.StudentId).ToList();
 
-				
+
 				return new DisplayMessageContact()
 				{
-					MissedMessagesCount= sub.Count(),
+					MissedMessagesCount = sub.Count(),
 					DisplayName = u.Student.FirstName + " " + u.Student.LastName,
 					Email = u.Student.Email,
-					SubText = u.Student.AccountType != "Student" ? "Tutor" : "Student",
+					SubText = u.Student.AccountType,// != "Student" ? "Tutor" : "Student",
 					RecieverId = u.StudentId,
 					CourseGroupId = u.CourseId,
 					IsGroup = false,
@@ -334,7 +410,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 
 				};
-				}
+			}
 			).ToList();
 
 			var registeredCourses = courseStuds.GroupBy(u => u.CourseId).Select(e => e.First()).Select(u =>
@@ -358,7 +434,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 				};
 			}).ToList();
-			
+
 			var displayContacts = registeredCourses.ToList().Concat(registeredCoursesStudents.ToList());
 
 			return displayContacts.ToList();

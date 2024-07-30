@@ -29,6 +29,8 @@ namespace TutorApplication.Extensions
 			services.AddScoped<IMessageHubServices, MessageHubServices>();
 			services.AddScoped<IHubServices, HubServices>();
 			services.AddScoped<IPhotoService, PhotoService>();
+			services.AddScoped<ISearchService, SearchService>();
+			services.AddScoped<IQuizService, QuizService>();
 			return services;
 		}
 	}

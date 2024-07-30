@@ -105,8 +105,8 @@ namespace TutorApplication.ApplicationCore.Services
 		private Expression<Func<Course, bool>> Search(PaginationRequest pagination)
 		{
 			return u =>
-			(u.CourseTitle.ToLower().Contains(pagination.CourseKeyWord.ToLower()) || (pagination.CourseKeyWord == "All" && u.isDetailsCompleted == true) || string.IsNullOrEmpty(pagination.CourseKeyWord) || u.About.ToLower().Contains(pagination.CourseKeyWord.ToLower())|| u.isDetailsCompleted == true);
-
+			(u.CourseTitle.ToLower().Contains(pagination.CourseKeyWord.ToLower()) || pagination.CourseKeyWord == "All") && u.isDetailsCompleted == true;
+			// u.About.ToLower().Contains(pagination.CourseKeyWord.ToLower())||
 		}
 
 		//Add Extension here to fix repeatability
@@ -273,7 +273,7 @@ namespace TutorApplication.ApplicationCore.Services
 
 
 			long? timestamp = null;// 1720283128178;
-			int days = 4;
+			int days = 7;
 			Dictionary<string, List<ClassResponse>> keyValuePairs = new Dictionary<string, List<ClassResponse>>();
 
 			

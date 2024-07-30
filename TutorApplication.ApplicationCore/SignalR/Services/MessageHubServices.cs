@@ -1,4 +1,5 @@
-﻿using TutorApplication.ApplicationCore.Services.Interfaces;
+﻿using TutorApplication.ApplicationCore.Extensions;
+using TutorApplication.ApplicationCore.Services.Interfaces;
 using TutorApplication.Infrastructure.Repositories.Interfaces;
 using TutorApplication.SharedModels.Entities;
 using TutorApplication.SharedModels.Requests;
@@ -22,9 +23,11 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			var directMessage = new DirectMessageRequest()
 			{
 				Content = request.Content,
-				RecieverId = (Guid)request.RecieverId
+				RecieverId = (Guid)request.RecieverId,
+				Photos = request.Photos
 			};
 			var res = await _messageService.SendDirectMessage(directMessage, senderId);
+			var phots = new Photo();
 
 			return new MessageResponse()
 			{
@@ -32,6 +35,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 				SenderId = senderId,
 				Content = res.Content,
 				Created = res.Created,
+				Photos = res.Photos!=null? res.Photos.ConvertPhotoToPhotoResponse():null,
 				SenderName = res.Sender.LastName + " " + res.Sender.FirstName
 			};
 		}
@@ -87,7 +91,8 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			var courseGroupMessage = new CourseGroupMessageRequest()
 			{
 				Content = request.Content,
-				CourseGroupId = (Guid)request.CourseGroupId
+				CourseGroupId = (Guid)request.CourseGroupId,
+				Photos = request.Photos
 			};
 			var res = await _messageService.SendCourseGroupMessage(courseGroupMessage, senderId);
 			var course = await _unitOfWork.Courses.GetItem(u => u.Id == request.CourseGroupId);
@@ -97,6 +102,7 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 				SenderId = senderId,
 				Content = res.Content,
 				Created = res.Created,
+				Photos = res.Photos != null ? res.Photos.ConvertPhotoToPhotoResponse() : null,
 				SenderName = res.Sender.LastName + " "+ res.Sender.FirstName + (course.TutorId == senderId ? " (Tutor)" : "")
 			};
 		}

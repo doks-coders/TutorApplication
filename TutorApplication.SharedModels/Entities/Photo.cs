@@ -12,5 +12,7 @@ namespace TutorApplication.SharedModels.Entities
 		public string PublicId { get; set; }
 		public Course Course { get; set; }		
 		public Guid? CourseId { get; set; }
+		public Guid? MessageId { get; set; }
+		public Message Message { get; set; }
 	}
 }

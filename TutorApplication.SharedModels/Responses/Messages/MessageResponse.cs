@@ -8,5 +8,6 @@
 		public string Mode { get; set; } = "chat";
 		public DateTime Created { get; set; }
 		public Guid SenderId { get; set; }
+		public List<PhotoResponse>? Photos{ get; set; }
 	}
 }
