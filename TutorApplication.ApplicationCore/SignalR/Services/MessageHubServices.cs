@@ -92,7 +92,8 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 			{
 				Content = request.Content,
 				CourseGroupId = (Guid)request.CourseGroupId,
-				Photos = request.Photos
+				Photos = request.Photos,
+				QuizId = request.QuizId
 			};
 			var res = await _messageService.SendCourseGroupMessage(courseGroupMessage, senderId);
 			var course = await _unitOfWork.Courses.GetItem(u => u.Id == request.CourseGroupId);
@@ -103,7 +104,8 @@ namespace TutorApplication.ApplicationCore.SignalR.Services
 				Content = res.Content,
 				Created = res.Created,
 				Photos = res.Photos != null ? res.Photos.ConvertPhotoToPhotoResponse() : null,
-				SenderName = res.Sender.LastName + " "+ res.Sender.FirstName + (course.TutorId == senderId ? " (Tutor)" : "")
+				SenderName = res.Sender.LastName + " "+ res.Sender.FirstName + (course.TutorId == senderId ? " (Tutor)" : ""),
+				Quiz = res.Quiz!=null?new QuizResponse() { Id=res.Quiz.Id,QuizName=res.Quiz.QuizName}:null
 			};
 		}
 

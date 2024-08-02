@@ -10,5 +10,6 @@ namespace TutorApplication.SharedModels.Requests
 		public List<PhotoResponse>? Photos { get; set; }	
 		public Guid? CourseGroupId { get; set; }
 		public string Content { get; set; }
+		public Guid? QuizId { get; set; }
 	}
 }

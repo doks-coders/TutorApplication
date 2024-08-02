@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -41,12 +42,38 @@ namespace TutorApplication.ApplicationCore.Services
 			}
 			throw new CustomException(ErrorCodes.ErrorWhileSaving);
 		}
-		//index and quizId
-		
-		public async Task<ResponseModel> GetQuiz(Guid quizId)
+
+		public async Task<ResponseModel> UpdateQuiz(UpdateQuizRequest request)
+		{
+			var quiz = await _unitOfWork.Quizs.GetItem(u => u.Id == request.Id);
+			quiz.QuizQuestions = request.QuizQuestions;
+			quiz.QuizName = request.QuizName;
+			await _unitOfWork.SaveChanges();
+			return ResponseModel.Send("Update Completed Successfully");
+			
+		}
+
+		public async Task<ResponseModel> GetCompleteQuiz(Guid quizId, ClaimsPrincipal user)
 		{
 			var quiz = await _unitOfWork.Quizs.GetItem(u => u.Id == quizId);
 			if (quiz == null) throw new CustomException("Quiz does not exist");
+			return ResponseModel.Send(quiz);
+		}
+
+		//index and quizId
+
+		public async Task<ResponseModel> GetQuiz(Guid quizId)
+		{
+			JsonSerializerOptions options = new()
+			{
+				PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			};
+			var quiz = await _unitOfWork.Quizs.GetItem(u => u.Id == quizId);
+			if (quiz == null) throw new CustomException("Quiz does not exist");
+
+			var quizQuestions = JsonSerializer.Deserialize<List<QuizQuestionResponse>>(quiz.QuizQuestions, options);
+			quiz.QuizQuestions = JsonSerializer.Serialize(quizQuestions,options);
+
 			return ResponseModel.Send(quiz);
 		}
 
@@ -70,6 +97,17 @@ namespace TutorApplication.ApplicationCore.Services
 			return ResponseModel.Send(quizQuestion);
 		}
 
+	}
+
+	public class QuizQuestionResponse
+	{
+		public string? question { get; set; } = "";
+		public string? mode { get; set; } = "";
+		public List<Option>? options { get; set; }
+		public string? optionsAnswer  = "";
+		public string? trueFalseAnswer = "";
+		public string? reason = "";
+		public int? points { get; set; }
 	}
 
 	public class QuizQuestion

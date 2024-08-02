@@ -41,7 +41,7 @@ namespace TutorApplication.ApplicationCore.Services
 			var messages = await _unitOfWork.Messages.GetItems(
 				u => u.isCourseGroup == true
 				&&
-				u.CourseId == courseGroupId, includeProperties: "Sender,Photos");
+				u.CourseId == courseGroupId, includeProperties: "Sender,Photos,Quiz");
 
 			JsonSerializerOptions options = new()
 			{
@@ -56,7 +56,9 @@ namespace TutorApplication.ApplicationCore.Services
 				Created = u.Created,
 				Id = u.Id,
 				Photos = u.Photos.ConvertPhotoToPhotoResponse(),
-				SenderName = u.Sender.LastName + " " + u.Sender.FirstName + (u.SenderId == course.TutorId ? " (Tutor)" : "")
+				SenderName = u.Sender.LastName + " " + u.Sender.FirstName + (u.SenderId == course.TutorId ? " (Tutor)" : ""),
+				Quiz=u.Quiz!=null?new QuizResponse() { Id=u.Quiz.Id,QuizName=u.Quiz.QuizName}:null
+				
 			}).ToList();
 
 			var userGroup = await _unitOfWork.UserGroups.GetItem(u => u.UserId == senderId && u.CourseGroupId == courseGroupId && u.isGroup == "true");
@@ -180,12 +182,21 @@ namespace TutorApplication.ApplicationCore.Services
 
 		public async Task<Message> SendCourseGroupMessage(CourseGroupMessageRequest request, Guid senderId)
 		{
+			var isAdmin = false;
+			var course = await _unitOfWork.Courses.GetItem(u => u.Id == request.CourseGroupId);
+			if (course.TutorId == senderId)
+			{
+				isAdmin = true;
+			}
+			if (!isAdmin && request.QuizId != null) throw new CustomException("Not an admin");
+		
 			var message = new Message()
 			{
 				SenderId = senderId,
 				CourseId = request.CourseGroupId,
 				Content = request.Content,
-				isCourseGroup = true
+				isCourseGroup = true,
+				QuizId = request.QuizId
 			};
 			await _unitOfWork.Messages.AddItem(message);
 			await _unitOfWork.SaveChanges();
@@ -197,7 +208,9 @@ namespace TutorApplication.ApplicationCore.Services
 			}
 
 			var user = await _unitOfWork.Users.GetItem(u => u.Id == message.SenderId);
+			var quiz = await _unitOfWork.Quizs.GetItem(u => u.Id == request.QuizId);
 			message.Sender = user;
+			message.Quiz = quiz;
 			return message;
 		}
 

@@ -21,11 +21,25 @@ namespace TutorApplication.Controllers
 			return await _quizService.CreateQuiz(request);
 			
 		}
+		[HttpPost("update-quiz")]
+		public async Task<ActionResult> UpdateQuiz(UpdateQuizRequest request)
+		{
+			return await _quizService.UpdateQuiz(request);
+		}
+
+		
+
 
 		[HttpGet("get-quiz/{quizId}")]
 		public async Task<ActionResult> GetQuiz(Guid quizId)
 		{
 			return await _quizService.GetQuiz(quizId);
+		}
+
+		[HttpGet("get-complete-quiz/{quizId}")]
+		public async Task<ActionResult> GetCompleteQuiz(Guid quizId)
+		{
+			return await _quizService.GetCompleteQuiz(quizId,User);
 		}
 
 		[HttpGet("get-course-quizs/{courseId}")]

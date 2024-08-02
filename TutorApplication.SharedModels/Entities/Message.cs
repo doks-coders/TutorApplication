@@ -28,6 +28,11 @@ namespace TutorApplication.SharedModels.Entities
 
 		public List<Photo>? Photos { get; set; }
 
+		public Guid? QuizId { get; set; }
+		[ForeignKey(nameof(QuizId))]
+		[DeleteBehavior(DeleteBehavior.NoAction)]
+		public Quiz Quiz { get; set; }
+
 
 	}
 }

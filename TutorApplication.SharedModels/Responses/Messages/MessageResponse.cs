@@ -1,4 +1,6 @@
-﻿namespace TutorApplication.SharedModels.Responses.Messages
+﻿using TutorApplication.SharedModels.Requests;
+
+namespace TutorApplication.SharedModels.Responses.Messages
 {
 	public class MessageResponse
 	{
@@ -9,5 +11,6 @@
 		public DateTime Created { get; set; }
 		public Guid SenderId { get; set; }
 		public List<PhotoResponse>? Photos{ get; set; }
+		public QuizResponse? Quiz { get; set; }
 	}
 }
